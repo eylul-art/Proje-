@@ -1,0 +1,85 @@
+DROP TABLE IF EXISTS Users CASCADE;
+DROP TABLE IF EXISTS Movies CASCADE;
+DROP TABLE IF EXISTS Ratings CASCADE;
+DROP TABLE IF EXISTS Reviews CASCADE;
+DROP TABLE IF EXISTS Review_Likes CASCADE;
+DROP TABLE IF EXISTS Review_Replies CASCADE;
+DROP TABLE IF EXISTS Favorites CASCADE;
+DROP TABLE IF EXISTS Followers CASCADE;
+DROP TABLE IF EXISTS Search_History CASCADE;
+DROP TABLE IF EXISTS User_Stats CASCADE;
+
+CREATE TABLE IF NOT EXISTS Users (
+    id SERIAL PRIMARY KEY,
+    email VARCHAR(255) UNIQUE NOT NULL,
+    password_hash TEXT NOT NULL,
+    username VARCHAR(50) UNIQUE NOT NULL,
+    profile_picture TEXT,
+    favorite_genres TEXT[]
+);
+
+CREATE TABLE IF NOT EXISTS Movies (
+    id SERIAL PRIMARY KEY,
+    title VARCHAR(255) NOT NULL,
+    release_date DATE,
+    director VARCHAR(255),
+    actors TEXT[],
+    genre TEXT[],
+    description TEXT
+);
+
+CREATE TABLE IF NOT EXISTS Ratings (
+    id SERIAL PRIMARY KEY,
+    user_id INT REFERENCES Users(id) ON DELETE CASCADE,
+    movie_id INT REFERENCES Movies(id) ON DELETE CASCADE,
+    rating DECIMAL(2,1) CHECK (rating >= 0 AND rating <= 10),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS Reviews (
+    id SERIAL PRIMARY KEY,
+    user_id INT REFERENCES Users(id) ON DELETE CASCADE,
+    movie_id INT REFERENCES Movies(id) ON DELETE CASCADE,
+    review_text TEXT NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS Review_Likes (
+    id SERIAL PRIMARY KEY,
+    user_id INT REFERENCES Users(id) ON DELETE CASCADE,
+    review_id INT REFERENCES Reviews(id) ON DELETE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS Review_Replies (
+    id SERIAL PRIMARY KEY,
+    user_id INT REFERENCES Users(id) ON DELETE CASCADE,
+    review_id INT REFERENCES Reviews(id) ON DELETE CASCADE,
+    reply_text TEXT NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS Favorites (
+    id SERIAL PRIMARY KEY,
+    user_id INT REFERENCES Users(id) ON DELETE CASCADE,
+    movie_id INT REFERENCES Movies(id) ON DELETE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS Followers (
+    id SERIAL PRIMARY KEY,
+    follower_id INT REFERENCES Users(id) ON DELETE CASCADE,
+    following_id INT REFERENCES Users(id) ON DELETE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS Search_History (
+    id SERIAL PRIMARY KEY,
+    user_id INT REFERENCES Users(id) ON DELETE CASCADE,
+    search_query TEXT NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS User_Stats (
+    id SERIAL PRIMARY KEY,
+    user_id INT REFERENCES Users(id) ON DELETE CASCADE,
+    total_reviews INT DEFAULT 0,
+    average_rating DECIMAL(3,2) DEFAULT 0
+);
