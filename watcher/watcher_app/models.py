@@ -1,57 +1,76 @@
+from django.contrib.auth.models import AbstractUser, Group, Permission
 from django.db import models
-from django.contrib.auth.models import User
 
-class Film(models.Model):
+# Kullanıcı Modeli
+class User(AbstractUser):
+    profile_picture = models.ImageField(upload_to='profile_pics/', blank=True, null=True)
+    favorite_genres = models.ManyToManyField('Genre', blank=True, related_name='users')
+    groups = models.ManyToManyField(
+        Group,
+        related_name='custom_user_set',  # Change this to avoid clash
+        blank=True,
+    )
+    user_permissions = models.ManyToManyField(
+        Permission,
+        related_name='custom_user_permissions_set',  # Change this to avoid clash
+        blank=True,
+    )
+
+# Film Türü Modeli
+class Genre(models.Model):
+    name = models.CharField(max_length=100, unique=True)
+    
+    def __str__(self):
+        return self.name
+
+# Film Modeli
+class Movie(models.Model):
     title = models.CharField(max_length=255)
     director = models.CharField(max_length=255, blank=True, null=True)
     release_date = models.DateField(blank=True, null=True)
-    genre = models.JSONField(default=list)
+    genres = models.ManyToManyField(Genre, related_name='movies')
     description = models.TextField(blank=True, null=True)
-    created_at = models.DateTimeField(auto_now_add=True)
+    poster = models.ImageField(upload_to='movie_posters/', blank=True, null=True)
 
+    def __str__(self):
+        return self.title
+
+# Film Yorum ve Puanlama Modeli
 class Review(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
-    film = models.ForeignKey(Film, on_delete=models.CASCADE)
-    rating = models.IntegerField()
-    review_text = models.TextField(blank=True, null=True)
-    created_at = models.DateTimeField(auto_now_add=True)
-
-class ReviewLike(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
-    review = models.ForeignKey(Review, on_delete=models.CASCADE)
+    movie = models.ForeignKey(Movie, on_delete=models.CASCADE, related_name='reviews', null=True, blank=True)  # Geçici çözüm
+    text = models.TextField()
+    score = models.PositiveIntegerField()  # 1-10 arasında puan
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
-        unique_together = ('user', 'review')
+        unique_together = ('user', 'movie')  # Kullanıcı bir filme sadece bir yorum/puan bırakabilir
 
-class ReviewReply(models.Model):
+    def __str__(self):
+        return f"{self.user.username} - {self.movie.title}"
+    
+# Yorum Beğenme ve Yanıt Modeli
+class CommentInteraction(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
-    review = models.ForeignKey(Review, on_delete=models.CASCADE)
-    reply_text = models.TextField()
+    review = models.ForeignKey(Review, on_delete=models.CASCADE, related_name='interactions')
+    liked = models.BooleanField(default=False)
+    reply = models.TextField(blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
-class Favorite(models.Model):
+# Favori Filmler Modeli
+class FavoriteMovie(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
-    film = models.ForeignKey(Film, on_delete=models.CASCADE)
+    movie = models.ForeignKey(Movie, on_delete=models.CASCADE, related_name='favorited_by')
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
-        unique_together = ('user', 'film')
+        unique_together = ('user', 'movie')
 
+# Kullanıcı Takip Modeli
 class Follow(models.Model):
-    follower = models.ForeignKey(User, related_name='following', on_delete=models.CASCADE)
-    following = models.ForeignKey(User, related_name='followers', on_delete=models.CASCADE)
+    follower = models.ForeignKey(User, on_delete=models.CASCADE, related_name='following')
+    following = models.ForeignKey(User, on_delete=models.CASCADE, related_name='followers')
     created_at = models.DateTimeField(auto_now_add=True)
-
+    
     class Meta:
         unique_together = ('follower', 'following')
-
-class UserStats(models.Model):
-    user = models.OneToOneField(User, on_delete=models.CASCADE, primary_key=True)
-    total_reviews = models.IntegerField(default=0)
-    avg_rating = models.DecimalField(max_digits=3, decimal_places=2, default=0.0)
-
-class SearchLog(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
-    search_query = models.CharField(max_length=255)
-    created_at = models.DateTimeField(auto_now_add=True)
