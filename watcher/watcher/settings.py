@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 """
 
 from pathlib import Path
+import os
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -77,9 +78,9 @@ WSGI_APPLICATION = 'watcher.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'watcher_db',  # Veritabanı adı
-        'USER': 'nilsen',  # PostgreSQL kullanıcı adı
-        'PASSWORD': 'Erensen13',  # PostgreSQL şifreniz
+        'NAME': os.getenv('DB_NAME', 'watcher_db'),
+        'USER': os.getenv('DB_USER', 'nilsen'),
+        'PASSWORD': os.getenv('DB_PASSWORD', 'Erensen13'),
         'HOST': 'localhost',
         'PORT': '5432',
     }
