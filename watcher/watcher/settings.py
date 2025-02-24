@@ -77,14 +77,11 @@ WSGI_APPLICATION = 'watcher.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': os.getenv('DB_NAME', 'watcher_db'),
-        'USER': os.getenv('DB_USER', 'nilsen'),
-        'PASSWORD': os.getenv('DB_PASSWORD', 'Erensen13'),
-        'HOST': 'localhost',
-        'PORT': '5432',
+        'ENGINE': 'django.db.backends.sqlite3',  # Or another database engine like 'django.db.backends.postgresql'
+        'NAME': BASE_DIR / 'db.sqlite3',  # Path to the database file
     }
 }
+
 
 
 
