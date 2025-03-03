@@ -37,7 +37,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'watcher_app',
+    'account_app',
     'django.contrib.sites',  # Required by allauth
     'allauth',
     'allauth.account',
