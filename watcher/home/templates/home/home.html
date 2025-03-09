@@ -1,0 +1,31 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Anasayfa | Watcher</title>
+    <link rel="stylesheet" type="text/css" href="{% static 'home/css/home.css' %}">
+</head>
+<body>
+    <div class="navbar">
+        <div>
+            <a href="{% url 'home' %}">WATCHER</a>
+        </div>
+        <div>
+            {% if user.is_authenticated %}
+                <a href="{% url 'account_logout' %}">Çıkış Yap</a>
+            {% else %}
+                <a href="{% url 'account_signup' %}">Kayıt Ol</a>
+                <a href="{% url 'account_login' %}">Giriş Yap</a>
+            {% endif %}
+        </div>
+    </div>
+        {% if user.is_authenticated %}
+            <h1>Merhaba, {{ user.username }}</h1>
+        {% else %}
+        <h1>Merhaba, Watcher'a hoşgeldin!</h1>
+        <h1 class="small-text"><a href="{% url 'account_signup' %}">Hesabın yoksa Watcher'a kayıt ol</a></h1>
+        <h1 class="small-text"><a href="{% url 'account_login' %}">Ya da Giriş Yap</a></h1>
+        {% endif %}
+    
+</body>
+</html>
