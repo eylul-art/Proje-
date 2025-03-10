@@ -21,11 +21,11 @@
         </div>
     </div>
     <div class="login-container">
-        <h2>Signup</h2>
+        <h2>Kayıt Ol</h2>
         <form method="post" action="{% url 'account_signup' %}">
             {% csrf_token %}
             {{ form.as_p }}
-            <button type="submit">Signup</button>
+            <button type="submit">Kayıt Ol</button>
         </form>
     </div>
 </body>
