@@ -18,13 +18,14 @@ from django.contrib import admin
 from django.urls import path, include
 from django.contrib.auth import views as auth_views
 from home.views import home_view
+from account_app.views import CustomPasswordResetView, CustomPasswordResetDoneView, CustomPasswordResetConfirmView, CustomPasswordResetCompleteView
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('accounts/', include('allauth.urls')),  # Include allauth URLs
-    path('password_reset/', auth_views.PasswordResetView.as_view(), name='password_reset'),
-    path('password_reset/done/', auth_views.PasswordResetDoneView.as_view(), name='password_reset_done'),
-    path('reset/<uidb64>/<token>/', auth_views.PasswordResetConfirmView.as_view(), name='password_reset_confirm'),
-    path('reset/done/', auth_views.PasswordResetCompleteView.as_view(), name='password_reset_complete'),
-    path('',home_view, name='home'),
+    path('password/reset/', CustomPasswordResetView.as_view(), name='account_reset_password'),
+    path('password/reset/done/', CustomPasswordResetDoneView.as_view(), name='account_reset_done'),
+    path('password/reset/key/<uidb64>/<token>/', CustomPasswordResetConfirmView.as_view(), name='account_reset_confirm'),
+    path('password/reset/key/done/', CustomPasswordResetCompleteView.as_view(), name='account_reset_complete'),
+    path('', home_view, name='home'),
 ]

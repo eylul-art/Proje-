@@ -1,8 +1,23 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth import login, authenticate
-from django.contrib.auth.forms import UserCreationForm, PasswordResetForm
-from django.contrib.auth.views import PasswordResetView
+from django.contrib.auth.forms import UserCreationForm
 from django.urls import reverse_lazy
+from django.contrib.auth.views import PasswordResetView, PasswordResetDoneView, PasswordResetConfirmView, PasswordResetCompleteView
+
+class CustomPasswordResetView(PasswordResetView):
+    template_name = 'account/password_reset_form.html'
+    email_template_name = 'account/password_reset_email.html'
+    success_url = reverse_lazy('account_reset_done')
+
+class CustomPasswordResetDoneView(PasswordResetDoneView):
+    template_name = 'account/password_reset_done.html'
+
+class CustomPasswordResetConfirmView(PasswordResetConfirmView):
+    template_name = 'account/password_reset_confirm.html'
+    success_url = reverse_lazy('account_reset_complete')
+
+class CustomPasswordResetCompleteView(PasswordResetCompleteView):
+    template_name = 'account/password_reset_done.html'
 
 def signup_view(request):
     if request.method == 'POST':
@@ -26,9 +41,3 @@ def login_view(request):
         else:
             return render(request, 'account_app/login.html', {'error': 'Invalid username or password'})
     return render(request, 'account_app/login.html')
-
-class CustomPasswordResetView(PasswordResetView):
-    template_name = 'account_app/password_reset.html'
-    success_url = reverse_lazy('password_reset_done')
-    email_template_name = 'account_app/password_reset_email.html'
-    form_class = PasswordResetForm
