@@ -42,7 +42,8 @@ INSTALLED_APPS = [
     'django.contrib.sites',  # Required by allauth
     'allauth',
     'allauth.account',
-    'home'
+    'home',
+    'movies',
     #'allauth.socialaccount',  # If you want to enable social login
 ]
 
@@ -160,3 +161,4 @@ STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 LOGIN_REDIRECT_URL = 'home'
 SIGNUP_REDIRECT_URL = 'home'
+TMDB_API_KEY = '815340d7995a1f090b13de1fb7adaa4f'

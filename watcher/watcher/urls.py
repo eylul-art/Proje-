@@ -28,4 +28,5 @@ urlpatterns = [
     path('password/reset/key/<uidb64>/<token>/', CustomPasswordResetConfirmView.as_view(), name='account_reset_confirm'),
     path('password/reset/key/done/', CustomPasswordResetCompleteView.as_view(), name='account_reset_complete'),
     path('', home_view, name='home'),
+    path('movies/', include('movies.urls')),
 ]
