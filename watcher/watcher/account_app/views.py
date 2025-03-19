@@ -3,20 +3,6 @@ from django.contrib.auth import login, authenticate
 from django.contrib.auth.forms import UserCreationForm
 from django.urls import reverse_lazy
 from django.contrib.auth.views import PasswordResetView, PasswordResetDoneView, PasswordResetConfirmView, PasswordResetCompleteView
-from django.shortcuts import render, get_object_or_404
-from .models import UserProfile, User
-
-def profile_view(request, username):
-    user = get_object_or_404(User, username=username)
-    profile = get_object_or_404(UserProfile, user=user)
-    favorite_movies = profile.favorite_movies.all()  # ✅ Favori filmleri çekiyoruz
-
-    return render(request, 'account/profile.html', {
-        'profile': profile,
-        'favorite_movies': favorite_movies
-    })
-
-
 
 class CustomPasswordResetView(PasswordResetView):
     template_name = 'account/password_reset_form.html'

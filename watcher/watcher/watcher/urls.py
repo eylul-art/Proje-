@@ -18,7 +18,7 @@ from django.contrib import admin
 from django.urls import path, include
 from django.contrib.auth import views as auth_views
 from home.views import home_view
-from account_app.views import CustomPasswordResetView, CustomPasswordResetDoneView, CustomPasswordResetConfirmView, CustomPasswordResetCompleteView, profile_view
+from account_app.views import CustomPasswordResetView, CustomPasswordResetDoneView, CustomPasswordResetConfirmView, CustomPasswordResetCompleteView
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -29,5 +29,4 @@ urlpatterns = [
     path('password/reset/key/done/', CustomPasswordResetCompleteView.as_view(), name='account_reset_complete'),
     path('', home_view, name='home'),
     path('movies/', include('movies.urls')),
-    path('profile/<str:username>/', profile_view, name='profile'),
 ]
