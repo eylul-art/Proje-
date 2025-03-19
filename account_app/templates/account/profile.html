@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profil Sayfası</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <style>
+        body {
+            background: linear-gradient(to right, #1e3c72, #2a5298);
+            color: white;
+        }
+        .navbar {
+            background-color: rgba(0, 0, 0, 0.8);
+        }
+        .profile-card {
+            background-color: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 20px;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .film-card {
+            background-color: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 15px;
+            margin: 10px;
+            transition: 0.3s;
+        }
+        .film-card:hover {
+            background-color: rgba(255, 255, 255, 0.2);
+            transform: scale(1.05);
+        }
+        .film-poster {
+            max-width: 100%;
+            border-radius: 10px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-dark">
+        <div class="container">
+            <a class="navbar-brand" href="/">Film Platformu</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item"><a class="nav-link" href="/">Anasayfa</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/movies/">Keşfet</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/favorites/">Favorilerim</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/logout/">Çıkış Yap</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mt-5">
+        <!-- Kullanıcı Profili -->
+        <div class="profile-card">
+            <h2>{{ user.username }}</h2>
+            <p><strong>E-posta:</strong> {{ user.email }}</p>
+            <p><strong>Üyelik Tarihi:</strong> {{ user.date_joined|date:"d M Y" }}</p>
+        </div>
+
+        <!-- Favori Filmler -->
+        <h3 class="text-center">Favori Filmlerim</h3>
+        <div class="row">
+            {% if favorite_movies %}
+                {% for movie in favorite_movies %}
+                    <div class="col-md-4">
+                        <div class="film-card">
+                            <a href="{% url 'movie_detail' movie.tmdb_id %}">
+                                <img src="{{ movie.poster_url }}" alt="{{ movie.title }}" class="film-poster">
+                            </a>
+                            <h4>{{ movie.title }}</h4>
+                        </div>
+                    </div>
+                {% endfor %}
+            {% else %}
+                <p class="text-center">Henüz favori film eklemediniz.</p>
+            {% endif %}
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

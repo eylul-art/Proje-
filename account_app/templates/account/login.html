@@ -1,0 +1,31 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Giriş Yap | Watcher</title>
+    <link rel="stylesheet" type="text/css" href="{% static 'account_app/css/account_app.css' %}">
+</head>
+<body>
+    <div class="navbar">
+        <div>
+            <a href="{% url 'home' %}">WATCHER</a>
+        </div>
+        <div>
+            {% if user.is_authenticated %}
+                <a href="{% url 'account_logout' %}">Çıkış Yap</a>
+            {% else %}
+                <a href="{% url 'account_signup' %}">Kayıt Ol</a>
+                <a href="{% url 'account_login' %}">Giriş Yap</a>
+            {% endif %}
+        </div>
+    </div>
+    <div class="login-container">
+        <h2>Giriş Yap</h2>
+        <form method="post" action="{% url 'account_login' %}">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <button type="submit">Giriş Yap</button>
+        </form>
+    </div>
+</body>
+</html>
