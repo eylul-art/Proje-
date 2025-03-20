@@ -17,7 +17,7 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include
 from django.contrib.auth import views as auth_views
-from home.views import home_view
+from home.views import home
 from account_app.views import CustomPasswordResetView, CustomPasswordResetDoneView, CustomPasswordResetConfirmView, CustomPasswordResetCompleteView, profile_view
 
 urlpatterns = [
@@ -27,7 +27,7 @@ urlpatterns = [
     path('password/reset/done/', CustomPasswordResetDoneView.as_view(), name='account_reset_done'),
     path('password/reset/key/<uidb64>/<token>/', CustomPasswordResetConfirmView.as_view(), name='account_reset_confirm'),
     path('password/reset/key/done/', CustomPasswordResetCompleteView.as_view(), name='account_reset_complete'),
-    path('', home_view, name='home'),
+    path('', home, name='home'),
     path('movies/', include('movies.urls')),
     path('profile/<str:username>/', profile_view, name='profile'),
 ]
