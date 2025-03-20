@@ -19,6 +19,11 @@
             border-radius: 10px;
             padding: 15px;
             margin: 10px;
+            text-align: center;
+        }
+        .film-card img {
+            width: 100%;
+            border-radius: 10px;
         }
     </style>
 </head>
@@ -31,10 +36,15 @@
             </button>
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav ms-auto">
-                    <li class="nav-item"><a class="nav-link" href="{%url 'account_signup'%}">Kaydol</a></li>
+                    {% if user.is_authenticated %}
+                        <li class="nav-item"><a class="nav-link" href="{% url 'profile' user.username %}">Profil</a></li>
+                        <li class="nav-item"><a class="nav-link" href="{% url 'account_logout' %}">Çıkış Yap</a></li>
+                    {% else %}
+                        <li class="nav-item"><a class="nav-link" href="{% url 'account_signup' %}">Kaydol</a></li>
+                        <li class="nav-item"><a class="nav-link" href="{% url 'account_login' %}">Giriş</a></li>
+                    {% endif %}
                     <li class="nav-item"><a class="nav-link" href="#">Keşfet</a></li>
                     <li class="nav-item"><a class="nav-link" href="#">Favoriler</a></li>
-                    <li class="nav-item"><a class="nav-link" href="{%url 'account_login'%}">Giriş</a></li>
                 </ul>
             </div>
         </div>
@@ -42,26 +52,24 @@
     
     <div class="container mt-5">
         <h2 class="text-center">Popüler Filmler</h2>
-        <div class="row">
-            <div class="col-md-4">
-                <div class="film-card">
-                    <h4>Film Adı</h4>
-                    <p>Film açıklaması burada yer alacak...</p>
+        
+        {% if movies %}
+            <div class="row">
+                {% for movie in movies %}
+                <div class="col-md-4">
+                    <div class="film-card">
+                        <img src="https://image.tmdb.org/t/p/w500{{ movie.poster_path }}" alt="{{ movie.title }}">
+                        <h4>{{ movie.title }}</h4>
+                        <p>{{ movie.overview|truncatechars:100 }}</p>
+                    </div>
                 </div>
+                {% endfor %}
             </div>
-            <div class="col-md-4">
-                <div class="film-card">
-                    <h4>Film Adı</h4>
-                    <p>Film açıklaması burada yer alacak...</p>
-                </div>
-            </div>
-            <div class="col-md-4">
-                <div class="film-card">
-                    <h4>Film Adı</h4>
-                    <p>Film açıklaması burada yer alacak...</p>
-                </div>
-            </div>
-        </div>
+        {% else %}
+            <p class="text-center">Filmler yüklenemedi. API'den veri alınamıyor.</p>
+        {% endif %}
+    </div>
+    
     </div>
     
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
