@@ -1,4 +1,21 @@
+# Bytecode and cache
 __pycache__/
-*.pyc
+*.py[cod]
+
+# Database
 db.sqlite3
-migrations/
+
+# Ignore compiled migration files only
+**/migrations/*.pyc
+**/migrations/__pycache__/
+
+# But keep the actual migration Python files
+!**/migrations/
+!**/migrations/__init__.py
+
+# Virtual environments
+venv/
+.venv/
+
+# macOS system file
+.DS_Store
