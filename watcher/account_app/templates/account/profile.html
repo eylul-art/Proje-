@@ -58,10 +58,9 @@
             </button>
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav ms-auto">
-                    <li class="nav-item"><a class="nav-link" href="#">Anasayfa</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{% url 'home'%}">Anasayfa</a></li>
                     <li class="nav-item"><a class="nav-link" href="#">Keşfet</a></li>
-                    <li class="nav-item"><a class="nav-link" href="#">Favorilerim</a></li>
-                    <li class="nav-item"><a class="nav-link" href="#">Çıkış Yap</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{% url 'account_logout'%}">Çıkış Yap</a></li>
                 </ul>
             </div>
         </div>
@@ -72,9 +71,9 @@
         <div class="row justify-content-center">
             <div class="col-md-6">
                 <div class="card p-4">
-                    <h3 class="fw-bold">ben</h3>
-                    <p><strong>E-posta:</strong> 23504458@ogr.gsu.edu.tr</p>
-                    <p><strong>Üyelik Tarihi:</strong> 21 Mar 2025</p>
+                    <h3 class="fw-bold">{{user.username}}</h3>
+                    <p><strong>E-posta:</strong> {{user.email}}</p>
+                    <p><strong>Üyelik Tarihi:</strong> {{ user.date_joined|date:"d M Y" }}5</p>
                 </div>
             </div>
         </div>
