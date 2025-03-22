@@ -9,12 +9,10 @@ from django.shortcuts import redirect
 
 def movie_detail(request, movie_id):
     """Belirtilen ID'ye sahip filmi detaylı gösterir veya TMDB API'den çekip kaydeder"""
-    
-    # Veritabanında bu TMDB ID'ye sahip film var mı?
+
     movie = Movie.objects.filter(tmdb_id=movie_id).first()
 
     if not movie:
-        # Film yoksa TMDB API'den çekelim
         api_key = settings.TMDB_API_KEY
         url = f"https://api.themoviedb.org/3/movie/{movie_id}?api_key={api_key}&language=tr-TR"
         response = requests.get(url)
@@ -29,14 +27,44 @@ def movie_detail(request, movie_id):
                 poster_url=f"https://image.tmdb.org/t/p/w500{data.get('poster_path', '')}"
             )
 
-    # Kullanıcının bu filmi favoriye ekleyip eklemediğini kontrol et
+
     is_favorite = False
     if request.user.is_authenticated:
-        profile, created = UserProfile.objects.get_or_create(user=request.user)
-        is_favorite = profile.favorite_movies.filter(tmdb_id=movie.tmdb_id).exists()
+        is_favorite = Favorite.objects.filter(user=request.user, movie=movie).exists()
 
-    return render(request, "movies/movie_page.html", {"movie": movie, "is_favorite": is_favorite})
+    return render(request, "movies/movie_page.html", {
+        "movie": movie,
+        "is_favorite": is_favorite
+    })
 
+def movie_list(request):
+    api_key = settings.TMDB_API_KEY
+    selected_genre = request.GET.get('genre_id')
+
+    # Fetch genres
+    genre_url = f"https://api.themoviedb.org/3/genre/movie/list?api_key={api_key}&language=tr-TR"
+    genres_response = requests.get(genre_url)
+    genres = genres_response.json().get('genres', [])
+
+    # Fetch multiple pages of popular movies
+    movies = []
+    for page in range(1, 4):  # Fetch page 1, 2, 3 (each has 20 movies)
+        movie_url = f"https://api.themoviedb.org/3/movie/popular?api_key={api_key}&language=tr-TR&page={page}"
+        response = requests.get(movie_url)
+        page_movies = response.json().get('results', [])
+        movies.extend(page_movies)
+
+    # Filter by genre
+    if selected_genre:
+        selected_genre = int(selected_genre)
+        movies = [m for m in movies if selected_genre in m['genre_ids']]
+
+    context = {
+        'movies': movies,
+        'genres': genres,
+        'selected_genre': selected_genre,
+    }
+    return render(request, 'movies/movie_list.html', context)
 
 @login_required
 def profile_view(request):

@@ -135,9 +135,11 @@
                 </button>
             </form>
         {% else %}
-            <p><a href="{% url 'login' %}" class="btn btn-warning">Giriş Yap</a>arak favorilere ekleyebilirsin.</p>
+            <p>
+                <a href="{% url 'account_login' %}" class="btn btn-warning">Giriş Yap</a>
+                <span>yaparak favorilere ekleyebilirsin.</span>
+            </p>
         {% endif %}
-
         <br>
         <a href="/" class="btn btn-light">Ana Sayfa</a>
     </div>
