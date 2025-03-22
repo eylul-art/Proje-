@@ -1,3 +1,4 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="tr">
 <head>
@@ -7,73 +8,120 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
     <style>
         body {
-            background: linear-gradient(to right, #1e3c72, #2a5298);
+            background: linear-gradient(to right, #8a2be2, #286f3e);
             color: white;
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
         }
+
+        /* Navbar */
         .navbar {
+            position: absolute;
+            top: 0;
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            padding: 15px 30px;
             background-color: rgba(0, 0, 0, 0.8);
         }
-        .movie-container {
-            max-width: 800px;
-            margin: auto;
-            background-color: rgba(255, 255, 255, 0.1);
-            border-radius: 10px;
-            padding: 20px;
-            text-align: center;
-            margin-top: 30px;
+
+        .navbar a {
+            color: white;
+            text-decoration: none;
+            margin-left: 15px;
         }
+
+        .navbar a:hover {
+            text-decoration: underline;
+        }
+
+        /* Movie details container */
+        .blur-container {
+            width: 80%;
+            max-width: 850px;
+            background: rgba(255, 255, 255, 0.2);
+            padding: 30px;
+            border-radius: 20px;
+            backdrop-filter: blur(20px);
+            box-shadow: 0px 4px 20px rgba(0, 0, 0, 0.3);
+            text-align: center;
+            margin: 100px auto 50px auto;
+        }
+
+        h1 {
+            font-size: 32px;
+            margin-bottom: 20px;
+        }
+
         .movie-poster {
             max-width: 100%;
             border-radius: 10px;
+            margin-bottom: 20px;
         }
+
         .favorite-btn {
-            background-color: #ff4757;
+            width: 60%;
+            padding: 14px;
+            background: linear-gradient(45deg, #8a2be2, #5a1c91);
             border: none;
-            padding: 10px 20px;
-            border-radius: 5px;
+            border-radius: 8px;
             color: white;
+            font-size: 18px;
             font-weight: bold;
             cursor: pointer;
             transition: 0.3s;
         }
+
         .favorite-btn:hover {
-            background-color: #e84118;
+            background: linear-gradient(45deg, #6d1fbf, #4e177a);
+        }
+
+        .btn-light {
+            margin-top: 15px;
+            background-color: rgba(255,255,255,0.8);
+            color: black;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-weight: bold;
+        }
+
+        .btn-warning {
+            background-color: #f0ad4e;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-weight: bold;
+            color: black;
         }
     </style>
 </head>
 <body>
-
     <!-- Navbar -->
-    <nav class="navbar navbar-expand-lg navbar-dark">
-        <div class="container">
-            <a class="navbar-brand" href="/">Film Platformu</a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav ms-auto">
-                    <li class="nav-item"><a class="nav-link" href="/">Anasayfa</a></li>
-                    <li class="nav-item"><a class="nav-link" href="/movies/">Keşfet</a></li>
-                    <li class="nav-item"><a class="nav-link" href="/profile/">Profilim</a></li>
-                    <li class="nav-item"><a class="nav-link" href="/logout/">Çıkış Yap</a></li>
-                </ul>
-            </div>
+    <div class="navbar">
+        <div>
+            <a href="/" class="navbar-brand"><strong>WATCHER</strong></a>
         </div>
-    </nav>
+        <div>
+            <a href="/">Anasayfa</a>
+            <a href="/movies/">Keşfet</a>
+            <a href="{% url 'profile' user.username %}">Profilim</a>
+            <a href="/logout/">Çıkış Yap</a>
+        </div>
+    </div>
 
-    <!-- Film Detayları -->
-    <div class="container movie-container">
+    <!-- Movie Details -->
+    <div class="blur-container">
         <h1>{{ movie.title }}</h1>
         <p><strong>Çıkış Tarihi:</strong> {{ movie.release_date }}</p>
         <p><strong>Özet:</strong> {{ movie.overview }}</p>
-        
+
         {% if movie.poster_url %}
             <img src="{{ movie.poster_url }}" alt="{{ movie.title }}" class="movie-poster">
         {% else %}
             <p>Poster bulunamadı.</p>
         {% endif %}
-
-        <br><br>
 
         {% if user.is_authenticated %}
             <form action="{% url 'toggle_favorite' movie.tmdb_id %}" method="POST">
@@ -89,7 +137,7 @@
         {% else %}
             <p><a href="{% url 'login' %}" class="btn btn-warning">Giriş Yap</a>arak favorilere ekleyebilirsin.</p>
         {% endif %}
-        
+
         <br>
         <a href="/" class="btn btn-light">Ana Sayfa</a>
     </div>
