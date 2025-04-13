@@ -1,22 +1,29 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth import login, authenticate
+from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import UserCreationForm
 from django.urls import reverse_lazy
 from django.contrib.auth.views import PasswordResetView, PasswordResetDoneView, PasswordResetConfirmView, PasswordResetCompleteView
 from django.shortcuts import render, get_object_or_404
 from .models import UserProfile, User
+from movies.models import Favorite
 
+@login_required
 def profile_view(request, username):
     user = get_object_or_404(User, username=username)
     profile = get_object_or_404(UserProfile, user=user)
-    favorite_movies = profile.favorite_movies.all()  # ✅ Favori filmleri çekiyoruz
+    favorites = Favorite.objects.filter(user=user).select_related('movie')
+
+    # Debug print
+    print("User:", user.username)
+    print("Favorites found:", favorites.count())
+    for fav in favorites:
+        print(" -", fav.movie.title)
 
     return render(request, 'account/profile.html', {
         'profile': profile,
-        'favorite_movies': favorite_movies
+        'favorites': favorites
     })
-
-
 
 class CustomPasswordResetView(PasswordResetView):
     template_name = 'account/password_reset_form.html'

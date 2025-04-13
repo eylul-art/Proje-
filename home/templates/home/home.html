@@ -20,10 +20,18 @@
             padding: 15px;
             margin: 10px;
             text-align: center;
+            transition: transform 0.2s ease;
+        }
+        .film-card:hover {
+            transform: scale(1.03);
         }
         .film-card img {
             width: 100%;
             border-radius: 10px;
+        }
+        a.card-link {
+            text-decoration: none;
+            color: inherit;
         }
     </style>
 </head>
@@ -57,11 +65,13 @@
             <div class="row">
                 {% for movie in movies %}
                 <div class="col-md-4">
-                    <div class="film-card">
-                        <img src="https://image.tmdb.org/t/p/w500{{ movie.poster_path }}" alt="{{ movie.title }}">
-                        <h4>{{ movie.title }}</h4>
-                        <p>{{ movie.overview|truncatechars:100 }}</p>
-                    </div>
+                    <a href="{% url 'movie_detail' movie.id %}" class="card-link">
+                        <div class="film-card">
+                            <img src="https://image.tmdb.org/t/p/w500{{ movie.poster_path }}" alt="{{ movie.title }}">
+                            <h4>{{ movie.title }}</h4>
+                            <p>{{ movie.overview|truncatechars:100 }}</p>
+                        </div>
+                    </a>
                 </div>
                 {% endfor %}
             </div>
@@ -69,9 +79,7 @@
             <p class="text-center">Filmler yüklenemedi. API'den veri alınamıyor.</p>
         {% endif %}
     </div>
-    
-    </div>
-    
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
