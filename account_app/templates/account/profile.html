@@ -79,27 +79,36 @@
         </div>
 
         <!-- Favori Filmlerim -->
-        <div class="row justify-content-center mt-4">
-            <div class="col-md-6">
-                <div class="card p-4">
-                    <h4 class="fw-bold">Favori Filmlerim</h4>
-        
-                    {% if favorite_movies %}
-                        <ul class="list-group list-group-flush">
-                            {% for movie in favorite_movies %}
-                                <li class="list-group-item bg-transparent text-white d-flex align-items-center">
-                                    <img src="{{ movie.poster_url }}" alt="{{ movie.title }}" style="width: 50px; height: auto; margin-right: 15px;">
-                                    <span>{{ movie.title }}</span>
-                                </li>
-                            {% endfor %}
-                        </ul>
-                    {% else %}
-                        <p class="text-white">Henüz favori film eklemediniz.</p>
-                    {% endif %}
-        
-                </div>
+    <div class="row justify-content-center mt-4">
+        <div class="col-md-10">
+            <div class="card p-4">
+                <h4 class="fw-bold mb-4">Favori Filmlerim</h4>
+
+                {% if favorite_movies %}
+                    <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-4">
+                        {% for movie in favorite_movies %}
+                            <div class="col">
+                                <div class="card h-100 bg-dark text-white border-0 shadow-sm">
+                                    <a href="{% url 'movie_detail' movie.tmdb_id %}" class="text-decoration-none text-white">
+                                        <img src="{{ movie.poster_url }}" class="card-img-top" alt="{{ movie.title }}" style="height: 350px; object-fit: cover; border-top-left-radius: 10px; border-top-right-radius: 10px;">
+                                        <div class="card-body">
+                                            <h5 class="card-title">{{ movie.title }}</h5>
+                                            <p class="card-text">
+                                                {{ movie.release_date|date:"d M Y" }}
+                                            </p>
+                                        </div>
+                                    </a>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <p class="text-white">Henüz favori film eklemediniz.</p>
+                {% endif %}
             </div>
         </div>
+    </div>
+
         
         
 

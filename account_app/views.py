@@ -26,7 +26,6 @@ def profile_view(request, username):
     # ✅ Ve şablona gönderiyoruz:
     return render(request, 'account/profile.html', {
         'profile': profile,
-        'favorites': favorites,
         'favorite_movies': favorite_movies,  # BUNU EKLEDİĞİNDEN EMİN OL
     })
 
