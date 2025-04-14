@@ -56,7 +56,7 @@ AUTHENTICATION_BACKENDS = [
 
 # Allauth settings
 ACCOUNT_LOGIN_METHODS = {'username', 'email'}
-ACCOUNT_EMAIL_REQUIRED = True
+ACCOUNT_SIGNUP_FIELDS = ['email*', 'username*', 'password1*', 'password2*']
 ACCOUNT_EMAIL_VERIFICATION = 'none'
 LOGIN_REDIRECT_URL = '/'
 LOGOUT_REDIRECT_URL = '/'

@@ -6,10 +6,22 @@ from django.http import JsonResponse
 from .models import Movie, Favorite
 from account_app.models import UserProfile
 from django.shortcuts import redirect
+from .forms import CommentForm
+from .models import Comment, Movie
+
+from django.shortcuts import render, get_object_or_404, redirect
+from .models import Movie, Comment
+from .forms import CommentForm
+
+import requests
+from django.conf import settings
+from django.shortcuts import render, redirect, get_object_or_404
+from .models import Movie, Comment, Favorite
+from .forms import CommentForm
 
 def movie_detail(request, movie_id):
     """Belirtilen ID'ye sahip filmi detaylı gösterir veya TMDB API'den çekip kaydeder"""
-
+    
     movie = Movie.objects.filter(tmdb_id=movie_id).first()
 
     if not movie:
@@ -26,16 +38,38 @@ def movie_detail(request, movie_id):
                 release_date=data.get("release_date", None),
                 poster_url=f"https://image.tmdb.org/t/p/w500{data.get('poster_path', '')}"
             )
+        else:
+            return render(request, "404.html", status=404)
 
+    # 🎯 Yorumlar
+    comments = movie.comments.all().order_by('-created_at')  # movie.comments → related_name='comments'
+    
+    if request.method == 'POST':
+        if request.user.is_authenticated:
+            form = CommentForm(request.POST)
+            if form.is_valid():
+                comment = form.save(commit=False)
+                comment.user = request.user
+                comment.movie = movie
+                comment.save()
+                return redirect('movie_detail', movie_id=movie.tmdb_id)
+        else:
+            return redirect('account_login')
+    else:
+        form = CommentForm()
 
+    # ❤️ Favori kontrolü
     is_favorite = False
     if request.user.is_authenticated:
         is_favorite = Favorite.objects.filter(user=request.user, movie=movie).exists()
 
     return render(request, "movies/movie_page.html", {
         "movie": movie,
-        "is_favorite": is_favorite
+        "is_favorite": is_favorite,
+        "comments": comments,
+        "form": form
     })
+
 
 def movie_list(request):
     api_key = settings.TMDB_API_KEY
@@ -109,3 +143,4 @@ def toggle_favorite(request, movie_id):
 
     # Film detay sayfasına geri dön
     return redirect('movie_detail', movie_id=movie.tmdb_id)
+
