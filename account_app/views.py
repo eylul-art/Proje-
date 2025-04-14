@@ -14,15 +14,20 @@ def profile_view(request, username):
     profile = get_object_or_404(UserProfile, user=user)
     favorites = Favorite.objects.filter(user=user).select_related('movie')
 
-    # Debug print
+    # ✅ Burada listemizi oluşturuyoruz:
+    favorite_movies = [fav.movie for fav in favorites]
+
+    # Debug - terminalde görüyorsun zaten
     print("User:", user.username)
     print("Favorites found:", favorites.count())
-    for fav in favorites:
-        print(" -", fav.movie.title)
+    for movie in favorite_movies:
+        print(" -", movie.title)
 
+    # ✅ Ve şablona gönderiyoruz:
     return render(request, 'account/profile.html', {
         'profile': profile,
-        'favorites': favorites
+        'favorites': favorites,
+        'favorite_movies': favorite_movies,  # BUNU EKLEDİĞİNDEN EMİN OL
     })
 
 class CustomPasswordResetView(PasswordResetView):
