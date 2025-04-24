@@ -3,11 +3,15 @@
 {% block content %}
 <div class="container">
     <h2 class="text-center mb-4">Popüler Filmler</h2>
+
+    <!-- Genre Filtresi -->
     <form method="GET" class="mb-4 text-center">
         <select name="genre_id" class="form-select mx-auto" style="max-width: 300px;" onchange="this.form.submit()">
             <option value="">Tüm Türler</option>
             {% for genre in genres %}
-                <option value="{{ genre.id }}" {% if genre.id == selected_genre %}selected{% endif %}>{{ genre.name }}</option>
+                <option value="{{ genre.tmdb_id }}" {% if genre.tmdb_id == selected_genre %}selected{% endif %}>
+                    {{ genre.name }}
+                </option>
             {% endfor %}
         </select>
     </form>
@@ -17,18 +21,14 @@
             {% for movie in movies %}
                 <div class="col-md-3 mb-4">
                     <div class="blur-container text-center p-3 h-100">
-                        <a href="{% url 'movie_detail' movie.id %}" class="text-decoration-none text-white">
-                            <img src="https://image.tmdb.org/t/p/w500{{ movie.poster_path }}" alt="{{ movie.title }}" class="img-fluid rounded mb-2" style="max-height: 250px; object-fit: cover;">
+                        <a href="{% url 'movie_detail' movie.tmdb_id %}" class="text-decoration-none text-white">
+                            <img src="{{ movie.poster_url }}" alt="{{ movie.title }}" class="img-fluid rounded mb-2" style="max-height: 250px; object-fit: cover;">
                             <h5>{{ movie.title }}</h5>
-                            <p><small>Rating: {{ movie.vote_average }}</small></p>
+                            <p><small>Rating bilgisi yok</small></p>
                         </a>
                         <div class="mt-2">
-                            {% for gid in movie.genre_ids %}
-                                {% for genre in genres %}
-                                    {% if genre.id == gid %}
-                                        <span class="badge bg-light text-dark me-1">{{ genre.name }}</span>
-                                    {% endif %}
-                                {% endfor %}
+                            {% for genre in movie.genres.all %}
+                                <span class="badge bg-light text-dark me-1">{{ genre.name }}</span>
                             {% endfor %}
                         </div>
                     </div>

@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Movie, Favorite
+from .models import Movie, Favorite, Comment, Genre
 
 @admin.register(Movie)
 class MovieAdmin(admin.ModelAdmin):
@@ -8,3 +8,6 @@ class MovieAdmin(admin.ModelAdmin):
 @admin.register(Favorite)
 class FavoriteAdmin(admin.ModelAdmin):
     list_display = ('user', 'movie')
+    
+admin.site.register(Genre)
+admin.site.register(Comment)

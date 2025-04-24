@@ -1,27 +1,14 @@
 import requests
-from django.shortcuts import render, get_object_or_404
+from django.shortcuts import render, get_object_or_404, redirect
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
-from .models import Movie, Favorite
+from .models import Movie, Favorite, Comment, Genre
+from .forms import CommentForm
 from account_app.models import UserProfile
-from django.shortcuts import redirect
-from .forms import CommentForm
-from .models import Comment, Movie
 
-from django.shortcuts import render, get_object_or_404, redirect
-from .models import Movie, Comment
-from .forms import CommentForm
-
-import requests
-from django.conf import settings
-from django.shortcuts import render, redirect, get_object_or_404
-from .models import Movie, Comment, Favorite
-from .forms import CommentForm
-
+# 🎬 FILM DETAY
 def movie_detail(request, movie_id):
-    """Belirtilen ID'ye sahip filmi detaylı gösterir veya TMDB API'den çekip kaydeder"""
-    
     movie = Movie.objects.filter(tmdb_id=movie_id).first()
 
     if not movie:
@@ -38,12 +25,19 @@ def movie_detail(request, movie_id):
                 release_date=data.get("release_date", None),
                 poster_url=f"https://image.tmdb.org/t/p/w500{data.get('poster_path', '')}"
             )
+
+            # 🎯 Türleri kaydet
+            for genre_data in data.get("genres", []):
+                genre, _ = Genre.objects.get_or_create(
+                    tmdb_id=genre_data["id"],
+                    defaults={"name": genre_data["name"]}
+                )
+                movie.genres.add(genre)
         else:
             return render(request, "404.html", status=404)
 
-    # 🎯 Yorumlar
-    comments = movie.comments.all().order_by('-created_at')  # movie.comments → related_name='comments'
-    
+    comments = movie.comments.all().order_by('-created_at')
+
     if request.method == 'POST':
         if request.user.is_authenticated:
             form = CommentForm(request.POST)
@@ -58,7 +52,6 @@ def movie_detail(request, movie_id):
     else:
         form = CommentForm()
 
-    # ❤️ Favori kontrolü
     is_favorite = False
     if request.user.is_authenticated:
         is_favorite = Favorite.objects.filter(user=request.user, movie=movie).exists()
@@ -70,28 +63,18 @@ def movie_detail(request, movie_id):
         "form": form
     })
 
-
+# 🎞 KEŞFET SAYFASI (şimdilik TMDB'den direkt, sonra genre tabanlı filtreleme ekleyebiliriz)
 def movie_list(request):
-    api_key = settings.TMDB_API_KEY
     selected_genre = request.GET.get('genre_id')
+    genres = Genre.objects.all()
 
-    # Fetch genres
-    genre_url = f"https://api.themoviedb.org/3/genre/movie/list?api_key={api_key}&language=tr-TR"
-    genres_response = requests.get(genre_url)
-    genres = genres_response.json().get('genres', [])
+    movies = Movie.objects.all().prefetch_related('genres')
 
-    # Fetch multiple pages of popular movies
-    movies = []
-    for page in range(1, 4):  # Fetch page 1, 2, 3 (each has 20 movies)
-        movie_url = f"https://api.themoviedb.org/3/movie/popular?api_key={api_key}&language=tr-TR&page={page}"
-        response = requests.get(movie_url)
-        page_movies = response.json().get('results', [])
-        movies.extend(page_movies)
-
-    # Filter by genre
     if selected_genre:
         selected_genre = int(selected_genre)
-        movies = [m for m in movies if selected_genre in m['genre_ids']]
+        print("🌸 Seçilen tür TMDB ID:", selected_genre)
+        movies = movies.filter(genres__tmdb_id=selected_genre)
+        print("🎬 Filtrelenmiş film sayısı:", movies.count())
 
     context = {
         'movies': movies,
@@ -100,18 +83,16 @@ def movie_list(request):
     }
     return render(request, 'movies/movie_list.html', context)
 
+# ❤️ PROFİL
 @login_required
 def profile_view(request):
     favorites = Favorite.objects.filter(user=request.user)
     return render(request, 'account_app/profile.html', {'favorites': favorites})
 
+# 💖 FAVORİ EKLE / ÇIKAR
 def toggle_favorite(request, movie_id):
-    """Kullanıcının bir filmi favorilere eklemesini veya çıkarmasını yönetir"""
-
-    # Film veritabanında var mı?
     movie = Movie.objects.filter(tmdb_id=movie_id).first()
 
-    # Yoksa TMDB API'den çekip veritabanına kaydet
     if not movie:
         api_key = settings.TMDB_API_KEY
         url = f"https://api.themoviedb.org/3/movie/{movie_id}?api_key={api_key}&language=tr-TR"
@@ -126,21 +107,18 @@ def toggle_favorite(request, movie_id):
                 release_date=data.get("release_date", None),
                 poster_url=f"https://image.tmdb.org/t/p/w500{data.get('poster_path', '')}"
             )
-        else:
-            # Film bulunamazsa bir hata sayfasına yönlendirilebilir
-            return redirect('error_page')  # veya render(request, 'error.html', ...)
 
-    # Favori verisini kontrol et / oluştur
+            for genre_data in data.get("genres", []):
+                genre, _ = Genre.objects.get_or_create(
+                    tmdb_id=genre_data["id"],
+                    defaults={"name": genre_data["name"]}
+                )
+                movie.genres.add(genre)
+        else:
+            return redirect('error_page')
+
     favorite, created = Favorite.objects.get_or_create(user=request.user, movie=movie)
 
     if not created:
-        # Zaten varsa kaldır
         favorite.delete()
-        status = "removed"
-    else:
-        # Yoksa ekle
-        status = "added"
-
-    # Film detay sayfasına geri dön
     return redirect('movie_detail', movie_id=movie.tmdb_id)
-
