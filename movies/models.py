@@ -36,7 +36,18 @@ class Comment(models.Model):
     movie = models.ForeignKey(Movie, on_delete=models.CASCADE, related_name='comments')
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     text = models.TextField()
+    acting = models.PositiveIntegerField(null=True, blank=True)
+    story = models.PositiveIntegerField(null=True, blank=True)
+    cinematography = models.PositiveIntegerField(null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     
+    class Meta:
+        unique_together = ('movie', 'user')
+
+    def average_rating(self):
+        if self.acting and self.story and self.cinematography:
+            return round((self.acting + self.story + self.cinematography) / 3, 2)
+        return None
+
     def __str__(self):
         return f"{self.user.username} - {self.movie.title}"

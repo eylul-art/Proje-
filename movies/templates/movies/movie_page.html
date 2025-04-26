@@ -1,6 +1,15 @@
 {% extends 'base.html' %}
 {% block title %}{{ movie.title }}{% endblock %}
 {% block content %}
+{% if messages %}
+  {% for message in messages %}
+    <div class="alert {% if message.tags %}alert-{{ message.tags }}{% endif %} alert-dismissible fade show" role="alert">
+      {{ message }}
+      <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+  {% endfor %}
+{% endif %}
+
 <div class="blur-container mx-auto" style="max-width: 850px; text-align: center; border-radius: 20px; padding: 40px;">
     <h1 class="mb-3">{{ movie.title }}</h1>
     <p><strong>Çıkış Tarihi:</strong> {{ movie.release_date }}</p>
@@ -10,6 +19,10 @@
         <img src="{{ movie.poster_url }}" alt="{{ movie.title }}" class="img-fluid rounded my-3" style="max-height: 400px;">
     {% else %}
         <p>Poster bulunamadı.</p>
+    {% endif %}
+
+    {% if average_rating %}
+        <h4 class="my-3">Genel Puan Ortalaması: {{ average_rating }} ⭐</h4>
     {% endif %}
 
     {% if user.is_authenticated %}
@@ -32,6 +45,25 @@
             <div class="mb-3">
                 {{ form.text }}
             </div>
+
+            <div class="mb-3">
+                <label>Oyunculuk:</label>
+                <div id="acting-stars" class="stars"></div>
+                <input type="hidden" name="acting" id="acting">
+            </div>
+
+            <div class="mb-3">
+                <label>Hikaye:</label>
+                <div id="story-stars" class="stars"></div>
+                <input type="hidden" name="story" id="story">
+            </div>
+
+            <div class="mb-3">
+                <label>Sinematografi:</label>
+                <div id="cinematography-stars" class="stars"></div>
+                <input type="hidden" name="cinematography" id="cinematography">
+            </div>
+
             <button type="submit" class="btn btn-light">Yorum Yap</button>
         </form>
     {% else %}
@@ -46,9 +78,71 @@
             <strong>{{ comment.user.username }}</strong>
             <small class="text-muted ms-2">{{ comment.created_at|date:"d M Y H:i" }}</small>
             <p class="mt-2">{{ comment.text }}</p>
+            {% if comment.average_rating %}
+                <p>
+                    Oyunculuk: {{ comment.acting }} ⭐ |
+                    Hikaye: {{ comment.story }} ⭐ |
+                    Sinematografi: {{ comment.cinematography }} ⭐
+                </p>
+            {% endif %}
         </div>
     {% empty %}
         <p>Henüz yorum yapılmamış. İlk sen ol!</p>
     {% endfor %}
 </div>
-{% endblock %}
+
+<!-- FontAwesome ve Yıldız Script -->
+<script>
+    function createStars(divId, inputId) {
+        const starsDiv = document.getElementById(divId);
+        const input = document.getElementById(inputId);
+    
+        if (!starsDiv || !input) {
+            console.error('DIV veya INPUT bulunamadı:', divId, inputId);
+            return;
+        }
+    
+        input.style.display = "none"; // input gözükmesin
+    
+        for (let i = 1; i <= 5; i++) {
+            const star = document.createElement('i');
+            star.classList.add('fa-regular', 'fa-star');
+            star.style.fontSize = '30px';
+            star.style.cursor = 'pointer';
+            star.style.marginRight = '5px';
+    
+            // ⭐ Tıklama eventi
+            star.addEventListener('click', function() {
+                const rating = parseInt(this.getAttribute('data-value'));
+                input.value = rating;
+                updateStars(divId, rating);
+            });
+    
+            // ⭐ Değer ata (hangi yıldıza tıklanırsa ona göre)
+            star.setAttribute('data-value', i);
+    
+            starsDiv.appendChild(star);
+        }
+    }
+    
+    function updateStars(divId, value) {
+        const stars = document.getElementById(divId).children;
+        for (let i = 0; i < stars.length; i++) {
+            if (i < value) {
+                stars[i].classList.remove('fa-regular');
+                stars[i].classList.add('fa-solid');
+            } else {
+                stars[i].classList.remove('fa-solid');
+                stars[i].classList.add('fa-regular');
+            }
+        }
+    }
+    
+    // ✨ Sayfa yüklenince yıldızları oluştur
+    document.addEventListener('DOMContentLoaded', function() {
+        createStars('acting-stars', 'acting');
+        createStars('story-stars', 'story');
+        createStars('cinematography-stars', 'cinematography');
+    });
+    </script>
+{% endblock %}    

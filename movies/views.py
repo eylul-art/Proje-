@@ -6,6 +6,7 @@ from django.http import JsonResponse
 from .models import Movie, Favorite, Comment, Genre
 from .forms import CommentForm
 from account_app.models import UserProfile
+from django.contrib import messages
 
 # 🎬 FILM DETAY
 def movie_detail(request, movie_id):
@@ -38,14 +39,27 @@ def movie_detail(request, movie_id):
 
     comments = movie.comments.all().order_by('-created_at')
 
+    # 🌟 Ortalama puanı hesapla
+    average_rating = None
+    all_averages = [comment.average_rating() for comment in comments if comment.average_rating() is not None]
+    if all_averages:
+        average_rating = round(sum(all_averages) / len(all_averages), 2)
+
     if request.method == 'POST':
         if request.user.is_authenticated:
+            existing_comment = Comment.objects.filter(user=request.user, movie=movie).first()
+            if existing_comment:
+                # 🌟 Hata mesajı gösterelim
+                messages.error(request, "Bu filme zaten yorum yaptın!")
+                return redirect('movie_detail', movie_id=movie.tmdb_id)
+
             form = CommentForm(request.POST)
             if form.is_valid():
                 comment = form.save(commit=False)
                 comment.user = request.user
                 comment.movie = movie
                 comment.save()
+                messages.success(request, "Yorumun başarıyla eklendi!")  # İstersen başarı mesajı da
                 return redirect('movie_detail', movie_id=movie.tmdb_id)
         else:
             return redirect('account_login')
@@ -60,8 +74,10 @@ def movie_detail(request, movie_id):
         "movie": movie,
         "is_favorite": is_favorite,
         "comments": comments,
-        "form": form
+        "form": form,
+        "average_rating": average_rating,
     })
+
 
 # 🎞 KEŞFET SAYFASI (şimdilik TMDB'den direkt, sonra genre tabanlı filtreleme ekleyebiliriz)
 def movie_list(request):
