@@ -15,7 +15,8 @@ class Movie(models.Model):
     overview = models.TextField()
     release_date = models.DateField()
     poster_url = models.URLField()
-    genres = models.ManyToManyField(Genre, blank=True)  #
+    genres = models.ManyToManyField(Genre, blank=True)  
+    popularity = models.FloatField(default=0)  
 
     def __str__(self):
         return self.title

@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <div class="container mt-5">
+        <h2>"{{ query }}" için arama sonuçları:</h2>
+
+        {% if movies %}
+            <div class="row">
+                {% for movie in movies %}
+                    <div class="col-md-3 mb-4">
+                        <div class="card">
+                            <img src="{{ movie.poster_url }}" class="card-img-top" alt="{{ movie.title }}">
+                            <div class="card-body">
+                                <h5 class="card-title">{{ movie.title }}</h5>
+                                <a href="{% url 'movie_detail' movie.tmdb_id %}" class="btn btn-primary">Detay</a>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <p>Hiçbir sonuç bulunamadı.</p>
+        {% endif %}
+    </div>
+{% endblock %}

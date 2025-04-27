@@ -19,6 +19,7 @@ from django.urls import path, include
 from django.contrib.auth import views as auth_views
 from home.views import home
 from account_app.views import CustomPasswordResetView, CustomPasswordResetDoneView, CustomPasswordResetConfirmView, CustomPasswordResetCompleteView, profile_view
+from movies.views import search_movies
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -30,4 +31,5 @@ urlpatterns = [
     path('', home, name='home'),
     path('movies/', include('movies.urls')),
     path('profile/<str:username>/', profile_view, name='profile'),
+    path('search/', search_movies, name='search'),
 ]
