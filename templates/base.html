@@ -50,8 +50,8 @@
                         <li class="nav-item"><a class="nav-link" href="{% url 'profile' user.username %}">Profil</a></li>
                         <li class="nav-item"><a class="nav-link" href="{% url 'account_logout' %}">Çıkış</a></li>
                     {% else %}
-                        <li class="nav-item"><a class="nav-link" href="{% url 'account_signup' %}">Kayıt</a></li>
-                        <li class="nav-item"><a class="nav-link" href="{% url 'account_login' %}">Giriş</a></li>
+                        <li class="nav-item"><a class="nav-link" href="{% url 'account_signup' %}">Kayıt Ol</a></li>
+                        <li class="nav-item"><a class="nav-link" href="{% url 'account_login' %}">Giriş Yap</a></li>
                     {% endif %}
                     <li class="nav-item"><a class="nav-link" href="{% url 'movie_list' %}">Keşfet</a></li>
                 </ul>
