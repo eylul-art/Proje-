@@ -24,7 +24,12 @@
                         <a href="{% url 'movie_detail' movie.tmdb_id %}" class="text-decoration-none text-white">
                             <img src="{{ movie.poster_url }}" alt="{{ movie.title }}" class="img-fluid rounded mb-2" style="max-height: 250px; object-fit: cover;">
                             <h5>{{ movie.title }}</h5>
+                            {% if movie.average_rating is not None %}
+                            <p>⭐ {{ movie.average_rating }}</p>
+                        {% else %}
                             <p><small>Rating bilgisi yok</small></p>
+                        {% endif %}
+                        
                         </a>
                         <div class="mt-2">
                             {% for genre in movie.genres.all %}

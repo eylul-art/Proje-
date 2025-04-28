@@ -88,9 +88,19 @@ def movie_list(request):
 
     if selected_genre:
         selected_genre = int(selected_genre)
-        print("🌸 Seçilen tür TMDB ID:", selected_genre)
         movies = movies.filter(genres__tmdb_id=selected_genre)
-        print("🎬 Filtrelenmiş film sayısı:", movies.count())
+
+    for movie in movies:
+        comments = movie.comments.all()
+        if comments:
+            all_averages = [comment.average_rating() for comment in comments if comment.average_rating() is not None]
+            if all_averages:
+                movie.average_rating = round(sum(all_averages) / len(all_averages), 2)
+            else:
+                movie.average_rating = None
+        else:
+            movie.average_rating = None
+
 
     context = {
         'movies': movies,
@@ -98,6 +108,7 @@ def movie_list(request):
         'selected_genre': selected_genre,
     }
     return render(request, 'movies/movie_list.html', context)
+
 
 # ❤️ PROFİL
 @login_required
