@@ -163,3 +163,6 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 LOGIN_REDIRECT_URL = 'home'
 SIGNUP_REDIRECT_URL = 'home'
 TMDB_API_KEY = '815340d7995a1f090b13de1fb7adaa4f'
+
+MEDIA_URL = '/media/'
+MEDIA_ROOT = BASE_DIR / 'media'

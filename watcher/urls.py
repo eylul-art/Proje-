@@ -18,8 +18,10 @@ from django.contrib import admin
 from django.urls import path, include
 from django.contrib.auth import views as auth_views
 from home.views import home
-from account_app.views import CustomPasswordResetView, CustomPasswordResetDoneView, CustomPasswordResetConfirmView, CustomPasswordResetCompleteView, profile_view
+from account_app.views import CustomPasswordResetView, CustomPasswordResetDoneView, CustomPasswordResetConfirmView, CustomPasswordResetCompleteView, profile_view, edit_profile, delete_account, follow_user, unfollow_user
 from movies.views import search_movies
+from django.conf import settings
+from django.conf.urls.static import static
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -30,6 +32,12 @@ urlpatterns = [
     path('password/reset/key/done/', CustomPasswordResetCompleteView.as_view(), name='account_reset_complete'),
     path('', home, name='home'),
     path('movies/', include('movies.urls')),
-    path('profile/<str:username>/', profile_view, name='profile'),
+    path('follow/<str:username>/', follow_user, name='follow_user'),
+    path('unfollow/<str:username>/', unfollow_user, name='unfollow_user'),
+    path('profile/edit/', edit_profile, name='edit_profile'),
+    path('users/<str:username>/', profile_view, name='profile_view'),
+    path('profile/delete/', delete_account, name='delete_account'),
     path('search/', search_movies, name='search'),
 ]
+if settings.DEBUG:
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

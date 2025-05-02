@@ -47,7 +47,7 @@
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav ms-auto align-items-center">
                     {% if user.is_authenticated %}
-                        <li class="nav-item"><a class="nav-link" href="{% url 'profile' user.username %}">Profil</a></li>
+                        <li class="nav-item"><a class="nav-link" href="{% url 'profile_view' user.username %}">Profil</a></li>
                         <li class="nav-item"><a class="nav-link" href="{% url 'account_logout' %}">Çıkış</a></li>
                     {% else %}
                         <li class="nav-item"><a class="nav-link" href="{% url 'account_signup' %}">Kayıt Ol</a></li>
