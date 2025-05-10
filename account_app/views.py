@@ -17,20 +17,28 @@ def profile_view(request, username):
     favorite_movies = Favorite.objects.filter(user=profile_user).select_related('movie')
     is_own_profile = request.user == profile_user
     is_following = False
-
+    is_follower = False
+    if request.user.is_authenticated and request.user != profile_user:
+        is_follower = profile.followers.filter(id=request.user.id).exists()
+        
     if request.user != profile_user:
         viewer_profile = get_object_or_404(UserProfile, user=request.user)
         is_following = viewer_profile.following.filter(pk=profile.pk).exists()
+    
+    favorite_movies = []
+    if profile_user == request.user or is_follower:
+        favorite_movies = Favorite.objects.filter(user=profile_user).select_related('movie')
 
     context = {
         'profile': profile,
         'favorite_movies': [fav.movie for fav in favorite_movies],
         'is_own_profile': is_own_profile,
+        'is_follower': is_follower,
         'is_following': is_following,
         'follower_count': profile.followers.count(),
         'following_count': profile.following.count(),
         'followers': profile.followers.all(),
-        'following': profile.following.all()
+        'following': profile.following.all(),
     }
     return render(request, 'account/profile.html', context)
 
