@@ -75,7 +75,7 @@
     <hr class="my-4">
     {% for comment in comments %}
         <div class="text-start mb-4 p-3" style="background-color: rgba(255,255,255,0.1); border-radius: 10px;">
-            <strong>{{ comment.user.username }}</strong>
+            <strong><a href="{% url 'profile_view' comment.user.username %}" class="text-decoration-none text-white">{{ comment.user.username }}</a></strong>
             <small class="text-muted ms-2">{{ comment.created_at|date:"d M Y H:i" }}</small>
             <p class="mt-2">{{ comment.text }}</p>
             {% if comment.average_rating %}
