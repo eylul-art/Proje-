@@ -11,6 +11,7 @@ from django.contrib import messages
 # 🎬 FILM DETAY
 def movie_detail(request, movie_id):
     movie = Movie.objects.filter(tmdb_id=movie_id).first()
+    id=int(movie_id)
 
     if not movie:
         api_key = settings.TMDB_API_KEY

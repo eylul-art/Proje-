@@ -38,27 +38,34 @@
     </div>
 
     <!-- Favorite Movies -->
-    <div class="blur-container mt-4 p-4">
-        <h4>Favori Filmler</h4>
-        {% if request.user.username == profile.user.username or is_follower %}
-            {% if favorite_movies %}
-                <ul class="list-group list-group-flush">
-                    {% for movie in favorite_movies %}
-                        <li class="list-group-item bg-transparent text-white d-flex align-items-center">
-                            <img src="{{ movie.poster_url }}" alt="{{ movie.title }}" style="height: 50px; border-radius: 5px; margin-right: 15px;">
-                            <a href="{% url 'movie_detail' movie.tmdb_id %}" class="text-white text-decoration-none flex-grow-1">{{ movie.title }}</a>
-                            <span class="badge bg-light text-dark">{{ movie.release_date|date:"d M Y" }}</span>
-                        </li>
-                    {% endfor %}
-                </ul>
-            {% else %}
-                <p class="text-white">Henüz favori film eklemediniz.</p>
-            {% endif %}
-        {% else %}
-            <p class="text-white fst-italic">Favori filmlerini sadece takipçileri görebilir.</p>
-        {% endif %}
-        
-    </div>
+    <!-- Favorite Movies -->
+<div class="blur-container mt-4 p-4">
+  <h4>Favori Filmler</h4>
+  {% if request.user.username == profile.user.username or is_follower %}
+      {% if favorite_movies %}
+          <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-4">
+              {% for movie in favorite_movies %}
+                  <div class="col">
+                      <div class="card h-100 text-bg-dark border-0 shadow" style="background-color: rgba(255, 255, 255, 0.1);">
+                          <a href="{% url 'movie_detail' movie.tmdb_id %}">
+                              <img src="{{ movie.poster_url }}" class="card-img-top" alt="{{ movie.title }}" style="height: 300px; object-fit: cover;">
+                          </a>
+                          <div class="card-body">
+                              <h6 class="card-title text-white">{{ movie.title }}</h6>
+                              <p class="card-text"><small class="text-light">{{ movie.release_date|date:"d M Y" }}</small></p>
+                          </div>
+                      </div>
+                  </div>
+              {% endfor %}
+          </div>
+      {% else %}
+          <p class="text-white">Henüz favori film eklemediniz.</p>
+      {% endif %}
+  {% else %}
+      <p class="text-white fst-italic">Favori filmlerini sadece takipçileri görebilir.</p>
+  {% endif %}
+</div>
+
   <!-- Followers Modal -->
 <div class="modal fade" id="followersModal" tabindex="-1" aria-labelledby="followersModalLabel" aria-hidden="true">
     <div class="modal-dialog">
