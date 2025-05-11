@@ -8,7 +8,7 @@
         {% for field in form %}
             <div class="form-group d-flex flex-column align-items-center">
             
-                <input type="text" name="{{ field.name }}" placeholder="{{ field.label }}"
+                <input type="{{ field.field.widget.input_type }}" name="{{ field.name }}" placeholder="{{ field.label }}"
                     style="width: 90%; padding: 12px; margin: 12px 0; border-radius: 12px; border: none; background: rgba(255, 255, 255, 0.2); color: white; font-size: 16px; text-align: center;">
                 {% if field.help_text %}<small class="text-white" style="width: 90%; text-align: left; display: block;">{{ field.help_text }}</small>{% endif %}
                 {% if field.errors %}<div class="text-danger small" style="width: 90%; text-align: left;">{{ field.errors }}</div>{% endif %}
