@@ -9,6 +9,7 @@ class UserProfile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     bio = models.TextField(blank=True)
     profile_picture = models.ImageField(upload_to='profile_pics/', blank=True, null=True)
+    is_private = models.BooleanField(default=True)
     following = models.ManyToManyField('self', symmetrical=False, related_name='followers', blank=True)
     favorite_movies= models.ManyToManyField(Movie, blank=True)
 
@@ -37,3 +38,14 @@ def create_user_profile(sender, instance, created, **kwargs):
 def save_user_profile(sender, instance, **kwargs):
     instance.userprofile.save()
 
+
+class FollowRequest(models.Model):
+    from_user = models.ForeignKey(User, related_name='sent_follow_requests', on_delete=models.CASCADE)
+    to_user = models.ForeignKey(User, related_name='received_follow_requests', on_delete=models.CASCADE)
+    timestamp = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        unique_together = ('from_user', 'to_user')
+
+    def __str__(self):
+        return f"{self.from_user} wants to follow {self.to_user}"

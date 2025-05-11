@@ -29,6 +29,12 @@ body {
     color: black;
 }
 
+.navbar-custom {
+    background-color: #480d66; /* Custom background color */
+    color: #e9d9eb; /* Custom text color */
+}
+
+
 .login-container {
     max-width: 300px;
     margin: 50px auto;

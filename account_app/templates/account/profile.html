@@ -5,73 +5,105 @@
 {% block content %}
 <div class="container mt-4 text-center">
 
-    <!-- Profile Header -->
-    <div class="blur-container p-4">
-        {% if profile.profile_picture %}
-            <img src="{{ profile.profile_picture.url }}" alt="Profile Picture" class="rounded-circle mb-3" style="width: 100px; height: 100px; object-fit: cover;">
-        {% else %}
-            <img src="{% static 'img/default-profile.png' %}" alt="Default Profile" class="rounded-circle mb-3" style="width: 100px; height: 100px; object-fit: cover;">
-        {% endif %}
+  <!-- Profile Header -->
+  <div class="blur-container p-4">
+    {% if profile.profile_picture %}
+      <img src="{{ profile.profile_picture.url }}" alt="Profile Picture" class="rounded-circle mb-3" style="width: 100px; height: 100px; object-fit: cover;">
+    {% else %}
+      <img src="{% static 'img/default-profile.png' %}" alt="Default Profile" class="rounded-circle mb-3" style="width: 100px; height: 100px; object-fit: cover;">
+    {% endif %}
 
-        <h3>{{ profile.user.username }}</h3>
-        <p>{{ profile.bio }}</p>
-        <p>
-            <strong><a href="#" data-bs-toggle="modal" data-bs-target="#followersModal">Takipçiler:</a></strong> {{ follower_count }}
-            |
-            <strong><a href="#" data-bs-toggle="modal" data-bs-target="#followingModal">Takip Edilen:</a></strong> {{ following_count }}
-          </p>
-          
-        {% if not is_own_profile %}
-            <form method="post" action="{% url is_following|yesno:'unfollow_user,follow_user' profile.user.username %}">
-                {% csrf_token %}
-                <button class="btn btn-{{ is_following|yesno:'danger,primary' }}">
-                    {{ is_following|yesno:"Unfollow,Follow" }}
-                </button>
-            </form>
-        {% else %}
-            <a href="{% url 'edit_profile' %}" class="btn btn-outline-light mt-2">Profili Düzenle</a>
-            <form method="post" action="{% url 'delete_account' %}" class="mt-2">
-                {% csrf_token %}
-                <button class="btn btn-outline-danger">Profili Sil</button>
-            </form>
-        {% endif %}
-    </div>
+    <h3>{{ profile.user.username }}</h3>
+    <p>{{ profile.bio }}</p>
+    <p>
+      <strong><a href="#" data-bs-toggle="modal" data-bs-target="#followersModal">Takipçiler:</a></strong> {{ follower_count }}
+      |
+      <strong><a href="#" data-bs-toggle="modal" data-bs-target="#followingModal">Takip Edilen:</a></strong> {{ following_count }}
+    </p>
 
-    <!-- Favorite Movies -->
-    <!-- Favorite Movies -->
-<div class="blur-container mt-4 p-4">
-  <h4>Favori Filmler</h4>
-  {% if request.user.username == profile.user.username or is_follower %}
-      {% if favorite_movies %}
-          <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-4">
-              {% for movie in favorite_movies %}
-                  <div class="col">
-                      <div class="card h-100 text-bg-dark border-0 shadow" style="background-color: rgba(255, 255, 255, 0.1);">
-                          <a href="{% url 'movie_detail' movie.tmdb_id %}">
-                              <img src="{{ movie.poster_url }}" class="card-img-top" alt="{{ movie.title }}" style="height: 300px; object-fit: cover;">
-                          </a>
-                          <div class="card-body">
-                              <h6 class="card-title text-white">{{ movie.title }}</h6>
-                              <p class="card-text"><small class="text-light">{{ movie.release_date|date:"d M Y" }}</small></p>
-                          </div>
-                      </div>
-                  </div>
-              {% endfor %}
-          </div>
+    {% if not is_own_profile %}
+      {% if profile.is_private and not is_follower %}
+        {% if has_pending_request %}
+          <button class="btn btn-secondary" disabled>İstek Gönderildi</button>
+        {% else %}
+          <form method="post" action="{% url 'send_follow_request' profile.user.username %}">
+            {% csrf_token %}
+            <button class="btn btn-warning">Takip İsteği Gönder</button>
+          </form>
+        {% endif %}
       {% else %}
-          <p class="text-white">Henüz favori film eklemediniz.</p>
+        <form method="post" action="{% url is_following|yesno:'unfollow_user,follow_user' profile.user.username %}">
+          {% csrf_token %}
+          <button class="btn btn-{{ is_following|yesno:'danger,primary' }}">
+            {{ is_following|yesno:"Unfollow,Follow" }}
+          </button>
+        </form>
       {% endif %}
-  {% else %}
+    {% else %}
+      <a href="{% url 'edit_profile' %}" class="btn btn-outline-light mt-2">Profili Düzenle</a>
+      <form method="post" action="{% url 'delete_account' %}" class="mt-2">
+        {% csrf_token %}
+        <button class="btn btn-outline-danger">Profili Sil</button>
+      </form>
+    {% endif %}
+  </div>
+
+  <!-- Favorite Movies -->
+  <div class="blur-container mt-4 p-4">
+    <h4>Favori Filmler</h4>
+    {% if not profile.is_private or request.user.username == profile.user.username or is_follower %}
+      {% if favorite_movies %}
+        <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-4">
+          {% for movie in favorite_movies %}
+            <div class="col">
+              <div class="card h-100 text-bg-dark border-0 shadow" style="background-color: rgba(255, 255, 255, 0.1);">
+                <a href="{% url 'movie_detail' movie.tmdb_id %}">
+                  <img src="{{ movie.poster_url }}" class="card-img-top" alt="{{ movie.title }}" style="height: 300px; object-fit: cover;">
+                </a>
+                <div class="card-body">
+                  <h6 class="card-title text-white">{{ movie.title }}</h6>
+                  <p class="card-text"><small class="text-light">{{ movie.release_date|date:"d M Y" }}</small></p>
+                </div>
+              </div>
+            </div>
+          {% endfor %}
+        </div>
+      {% else %}
+        <p class="text-white">Henüz favori film eklemediniz.</p>
+      {% endif %}
+    {% else %}
       <p class="text-white fst-italic">Favori filmlerini sadece takipçileri görebilir.</p>
+    {% endif %}
+  </div>
+
+  <!-- Follow Requests (only shown to profile owner) -->
+  {% if is_own_profile %}
+  <div class="blur-container mt-4 p-4">
+    <h4>Gelen Takip İstekleri</h4>
+    {% if incoming_requests %}
+      <ul class="list-group">
+        {% for req in incoming_requests %}
+          <li class="list-group-item d-flex justify-content-between align-items-center bg-transparent text-white border-white">
+            <a href="{% url 'profile_view' req.from_user.username %}" class="text-white">{{ req.from_user.username }}</a>
+            <form method="post" action="{% url 'accept_follow_request' req.id %}">
+              {% csrf_token %}
+              <button type="submit" class="btn btn-success btn-sm">Kabul Et</button>
+            </form>
+          </li>
+        {% endfor %}
+      </ul>
+    {% else %}
+      <p class="fst-italic">Henüz takip isteğiniz yok.</p>
+    {% endif %}
+  </div>
   {% endif %}
-</div>
 
   <!-- Followers Modal -->
-<div class="modal fade" id="followersModal" tabindex="-1" aria-labelledby="followersModalLabel" aria-hidden="true">
+  <div class="modal fade" id="followersModal" tabindex="-1" aria-labelledby="followersModalLabel" aria-hidden="true">
     <div class="modal-dialog">
       <div class="modal-content blur-container text-white">
         <div class="modal-header border-0">
-          <h5 class="modal-title" id="followersModalLabel">Followers</h5>
+          <h5 class="modal-title" id="followersModalLabel">Takipçiler</h5>
           <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
         <div class="modal-body">
@@ -95,7 +127,7 @@
       </div>
     </div>
   </div>
-  
+
   <!-- Following Modal -->
   <div class="modal fade" id="followingModal" tabindex="-1" aria-labelledby="followingModalLabel" aria-hidden="true">
     <div class="modal-dialog">
@@ -125,7 +157,6 @@
       </div>
     </div>
   </div>
-  
-  
+
 </div>
 {% endblock %}

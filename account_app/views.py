@@ -5,7 +5,7 @@ from django.contrib.auth.forms import UserCreationForm
 from django.urls import reverse_lazy
 from django.contrib.auth.views import PasswordResetView, PasswordResetDoneView, PasswordResetConfirmView, PasswordResetCompleteView
 from django.shortcuts import render, get_object_or_404
-from .models import UserProfile, User
+from .models import UserProfile, User, FollowRequest
 from movies.models import Favorite
 from .forms import ProfileUpdateForm
 from django.contrib import messages
@@ -28,6 +28,16 @@ def profile_view(request, username):
     favorite_movies = []
     if profile_user == request.user or is_follower:
         favorite_movies = Favorite.objects.filter(user=profile_user).select_related('movie')
+        
+    has_pending_request = False
+    if not is_own_profile:
+        has_pending_request = FollowRequest.objects.filter(from_user=request.user, to_user=profile_user).exists()
+        
+    incoming_requests = []
+    if is_own_profile:
+        incoming_requests = FollowRequest.objects.filter(to_user=request.user)
+
+
 
     context = {
         'profile': profile,
@@ -39,6 +49,8 @@ def profile_view(request, username):
         'following_count': profile.following.count(),
         'followers': profile.followers.all(),
         'following': profile.following.all(),
+        'has_pending_request': has_pending_request,
+        'incoming_requests': incoming_requests,
     }
     return render(request, 'account/profile.html', context)
 
@@ -115,3 +127,20 @@ def login_view(request):
         else:
             return render(request, 'account_app/login.html', {'error': 'Invalid username or password'})
     return render(request, 'account_app/login.html')
+
+@login_required
+def send_follow_request(request, username):
+    to_user = get_object_or_404(User, username=username)
+    if to_user != request.user:
+        FollowRequest.objects.get_or_create(from_user=request.user, to_user=to_user)
+    return redirect('profile_view', username=username)
+
+@login_required
+def accept_follow_request(request, request_id):
+    follow_request = get_object_or_404(FollowRequest, id=request_id, to_user=request.user)
+    follower_profile = get_object_or_404(UserProfile, user=follow_request.from_user)
+    following_profile = get_object_or_404(UserProfile, user=request.user)
+    
+    follower_profile.following.add(following_profile)
+    follow_request.delete()
+    return redirect('profile_view', username=request.user.username)

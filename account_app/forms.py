@@ -4,7 +4,7 @@ from .models import UserProfile
 class ProfileUpdateForm(forms.ModelForm):
     class Meta:
         model = UserProfile
-        fields = ['bio', 'profile_picture']
+        fields = ['bio', 'profile_picture', 'is_private', ]
         widgets = {
             'bio': forms.Textarea(attrs={
                 'class': 'form-control',
