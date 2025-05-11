@@ -16,32 +16,77 @@
         </select>
     </form>
 
-    <div class="row">
-        {% if movies %}
-            {% for movie in movies %}
-                <div class="col-md-3 mb-4">
-                    <div class="blur-container text-center p-3 h-100">
-                        <a href="{% url 'movie_detail' movie.tmdb_id %}" class="text-decoration-none text-white">
-                            <img src="{{ movie.poster_url }}" alt="{{ movie.title }}" class="img-fluid rounded mb-2" style="max-height: 250px; object-fit: cover;">
-                            <h5>{{ movie.title }}</h5>
-                            {% if movie.average_rating is not None %}
-                            <p>⭐ {{ movie.average_rating }}</p>
-                        {% else %}
-                            <p><small>Rating bilgisi yok</small></p>
-                        {% endif %}
-                
-                        </a>
-                        <div class="mt-2">
-                            {% for genre in movie.genres.all %}
-                                <span class="badge bg-light text-dark me-1">{{ genre.name }}</span>
-                            {% endfor %}
-                        </div>
-                    </div>
-                </div>
-            {% endfor %}
-        {% else %}
-            <p class="text-center text-white">Bu türde film bulunamadı.</p>
-        {% endif %}
+    <!-- Film Grid -->
+    <div id="movie-list" class="row"></div>
+
+    <!-- Yükleniyor -->
+    <div id="loading" class="text-center my-4" style="display: none;">
+        <span class="text-white">Yükleniyor...</span>
     </div>
 </div>
+
+<!-- Infinite Scroll Script -->
+<script>
+    let page = 1;
+    let loading = false;
+    let currentGenre = "";
+
+    const genreSelect = document.querySelector('select[name="genre_id"]');
+    genreSelect.addEventListener('change', function () {
+        currentGenre = this.value;
+        page = 1;
+        document.getElementById("movie-list").innerHTML = ""; // Eski içerikleri temizle
+        loadMovies();
+    });
+
+    function loadMovies() {
+        if (loading) return;
+        loading = true;
+        document.getElementById("loading").style.display = "block";
+
+        // ✅ Doğru fetch URL'si
+        let url = `/movies/api/load-more-movies/?page=${page}`;
+        if (currentGenre) {
+            url += `&genre_id=${currentGenre}`;
+        }
+
+        fetch(url)
+            .then(response => response.json())
+            .then(data => {
+                const movieList = document.getElementById("movie-list");
+                data.movies.forEach(movie => {
+                    const col = document.createElement("div");
+                    col.className = "col-md-3 mb-4";
+                    col.innerHTML = `
+                        <div class="blur-container text-center p-3 h-100">
+                            <a href="/movies/${movie.id}/" class="text-decoration-none text-white">
+                                <img src="${movie.poster_url}" alt="${movie.title}" class="img-fluid rounded mb-2" style="max-height: 250px; object-fit: cover;">
+                                <h5>${movie.title}</h5>
+                                <p><small>${movie.release_date || 'Tarih yok'}</small></p>
+                            </a>
+                        </div>
+                    `;
+                    movieList.appendChild(col);
+                });
+                page++;
+                loading = false;
+                document.getElementById("loading").style.display = "none";
+            })
+            .catch(() => {
+                loading = false;
+                document.getElementById("loading").style.display = "none";
+            });
+    }
+
+    window.addEventListener('scroll', () => {
+        if ((window.innerHeight + window.scrollY) >= document.body.offsetHeight - 200) {
+            loadMovies();
+        }
+    });
+
+    document.addEventListener("DOMContentLoaded", () => {
+        currentGenre = genreSelect.value;
+        loadMovies();
+    });
+</script>
 {% endblock %}

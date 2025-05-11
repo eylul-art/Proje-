@@ -2,6 +2,7 @@ import requests
 from django.shortcuts import render, get_object_or_404, redirect
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
+from django.views.decorators.http import require_GET
 from django.http import JsonResponse
 from .models import Movie, Favorite, Comment, Genre
 from .forms import CommentForm
@@ -80,7 +81,7 @@ def movie_detail(request, movie_id):
     })
 
 
-# 🎞 KEŞFET SAYFASI (şimdilik TMDB'den direkt, sonra genre tabanlı filtreleme ekleyebiliriz)
+# KEŞFET SAYFASI (şimdilik TMDB'den direkt, sonra genre tabanlı filtreleme ekleyebiliriz)
 def movie_list(request):
     selected_genre = request.GET.get('genre_id')
     genres = Genre.objects.all()
@@ -111,13 +112,13 @@ def movie_list(request):
     return render(request, 'movies/movie_list.html', context)
 
 
-# ❤️ PROFİL
+# PROFİL
 @login_required
 def profile_view(request):
     favorites = Favorite.objects.filter(user=request.user)
     return render(request, 'account_app/profile.html', {'favorites': favorites})
 
-# 💖 FAVORİ EKLE / ÇIKAR
+#  FAVORİ EKLE / ÇIKAR
 def toggle_favorite(request, movie_id):
     movie = Movie.objects.filter(tmdb_id=movie_id).first()
 
@@ -183,4 +184,40 @@ def search_movies(request):
         'movies': movies,
         'query': query
     })
+
+@require_GET
+def load_more_movies(request):
+    page = int(request.GET.get("page", 1))
+    genre_id = request.GET.get("genre_id")
+
+    api_key = settings.TMDB_API_KEY
+    url = f"https://api.themoviedb.org/3/discover/movie?api_key={api_key}&language=tr-TR&page={page}"
+    if genre_id:
+        url += f"&with_genres={genre_id}"
+
+    response = requests.get(url)
+    if response.status_code != 200:
+        return JsonResponse({'error': 'API hatası'}, status=500)
+
+    data = response.json()
+    movies_data = []
+
+    for movie_data in data.get('results', []):
+        movie, _ = Movie.objects.get_or_create(
+            tmdb_id=movie_data["id"],
+            defaults={
+                'title': movie_data.get("title", "Bilinmeyen"),
+                'overview': movie_data.get("overview", ""),
+                'release_date': movie_data.get("release_date") or None,
+                'poster_url': f"https://image.tmdb.org/t/p/w500{movie_data.get('poster_path', '')}" if movie_data.get('poster_path') else "",
+            }
+        )
+        movies_data.append({
+            'id': movie.tmdb_id,
+            'title': movie.title,
+            'poster_url': movie.poster_url,
+            'release_date': movie.release_date,
+        })
+
+    return JsonResponse({'movies': movies_data})
 
