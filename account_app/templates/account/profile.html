@@ -53,21 +53,20 @@
     <h4>Favori Filmler</h4>
     {% if not profile.is_private or request.user.username == profile.user.username or is_follower %}
       {% if favorite_movies %}
-        <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-4">
-          {% for movie in favorite_movies %}
-            <div class="col">
-              <div class="card h-100 text-bg-dark border-0 shadow" style="background-color: rgba(255, 255, 255, 0.1);">
-                <a href="{% url 'movie_detail' movie.tmdb_id %}">
-                  <img src="{{ movie.poster_url }}" class="card-img-top" alt="{{ movie.title }}" style="height: 300px; object-fit: cover;">
-                </a>
-                <div class="card-body">
-                  <h6 class="card-title text-white">{{ movie.title }}</h6>
-                  <p class="card-text"><small class="text-light">{{ movie.release_date|date:"d M Y" }}</small></p>
+      <div class="row">
+        {% for movie in favorite_movies %}
+            <div class="col-md-3 mb-4">
+                <div class="blur-container text-center p-3 h-100">
+                    <a href="{% url 'movie_detail' movie.tmdb_id %}" class="text-decoration-none text-white">
+                        <img src="{{ movie.poster_url }}" alt="{{ movie.title }}" class="img-fluid rounded mb-2" style="max-height: 250px; object-fit: cover;">
+                        <h5>{{ movie.title }}</h5>
+                        
+                    </a>
                 </div>
-              </div>
             </div>
-          {% endfor %}
-        </div>
+        {% endfor %}
+    </div>
+    
       {% else %}
         <p class="text-white">Henüz favori film eklemediniz.</p>
       {% endif %}

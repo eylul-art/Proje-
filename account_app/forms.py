@@ -9,7 +9,7 @@ class ProfileUpdateForm(forms.ModelForm):
             'bio': forms.Textarea(attrs={
                 'class': 'form-control',
                 'rows': 3,
-                'placeholder': 'Write something about yourself...',
+                'placeholder': 'Kendini tanıt...',
                 'style': 'background-color: rgba(255,255,255,0.8); border-radius: 8px;'
             }),
             'profile_picture': forms.ClearableFileInput(attrs={
