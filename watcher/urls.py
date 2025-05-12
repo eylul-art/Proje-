@@ -18,7 +18,7 @@ from django.contrib import admin
 from django.urls import path, include
 from django.contrib.auth import views as auth_views
 from home.views import home
-from account_app.views import CustomPasswordResetView, CustomPasswordResetDoneView, CustomPasswordResetConfirmView, CustomPasswordResetCompleteView, profile_view, edit_profile, delete_account, follow_user, unfollow_user, send_follow_request, accept_follow_request
+from account_app.views import CustomPasswordResetView, CustomPasswordResetDoneView, CustomPasswordResetConfirmView, CustomPasswordResetCompleteView, profile_view, edit_profile, delete_account, follow_user, unfollow_user, send_follow_request, accept_follow_request, reject_follow_request
 from movies.views import search_movies
 from django.conf import settings
 from django.conf.urls.static import static
@@ -40,6 +40,8 @@ urlpatterns = [
     path('search/', search_movies, name='search'),
     path('follow-request/send/<str:username>/', send_follow_request, name='send_follow_request'),
     path('follow-request/accept/<int:request_id>/', accept_follow_request, name='accept_follow_request'),
+    path('follow-request/reject/<int:request_id>/', reject_follow_request, name='reject_follow_request'),
+
 
 ]
 if settings.DEBUG:

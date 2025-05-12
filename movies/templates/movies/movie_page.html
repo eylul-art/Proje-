@@ -10,7 +10,8 @@
   {% endfor %}
 {% endif %}
 
-<div class="blur-container mx-auto" style="max-width: 850px; text-align: center; border-radius: 20px; padding: 40px;">
+<!-- 🎬 Film Detayları + Yorumlar ve Formlar -->
+<div class="blur-container mx-auto" style="max-width: 850px; text-align: center; border-radius: 20px; padding: 40px; position: relative; z-index: 1;">
     <h1 class="mb-3">{{ movie.title }}</h1>
     <p><strong>Çıkış Tarihi:</strong> {{ movie.release_date }}</p>
     <p><strong>Özet:</strong> {{ movie.overview }}</p>
@@ -72,9 +73,26 @@
         </p>
     {% endif %}
 
-    <hr class="my-4">
     {% for comment in comments %}
-        <div class="text-start mb-4 p-3" style="background-color: rgba(255,255,255,0.1); border-radius: 10px;">
+        <div class="text-start mb-4 p-3 position-relative" style="background-color: rgba(255,255,255,0.1); border-radius: 10px;">
+            
+            {% if comment.user == request.user %}
+            <!-- Üç Nokta -->
+            <div class="dropdown position-absolute top-0 end-0 me-2 mt-2">
+                <button class="btn btn-link text-white p-0" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                    <i class="fas fa-ellipsis-v"></i>
+                </button>
+                <ul class="dropdown-menu">
+                    <li>
+                        <button class="dropdown-item text-danger" data-bs-toggle="modal" data-bs-target="#confirmDeleteModal{{ comment.id }}">
+                            Yorumu Sil
+                        </button>
+                    </li>
+                </ul>
+            </div>
+            {% endif %}
+
+            <!-- Yorum Bilgisi -->
             <strong><a href="{% url 'profile_view' comment.user.username %}" class="text-decoration-none text-white">{{ comment.user.username }}</a></strong>
             <small class="text-muted ms-2">{{ comment.created_at|date:"d M Y H:i" }}</small>
             <p class="mt-2">{{ comment.text }}</p>
@@ -86,63 +104,74 @@
                 </p>
             {% endif %}
         </div>
-    {% empty %}
-        <p>Henüz yorum yapılmamış. İlk sen ol!</p>
     {% endfor %}
-</div>
+</div> <!-- ✨ blur-container kapanışı -->
 
-<!-- FontAwesome ve Yıldız Script -->
+<!-- ✅ Tüm modal’lar buraya taşındı -->
+{% for comment in comments %}
+    {% if comment.user == request.user %}
+    <div class="modal fade" id="confirmDeleteModal{{ comment.id }}" tabindex="-1" aria-labelledby="deleteLabel{{ comment.id }}" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content text-dark">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="deleteLabel{{ comment.id }}">Yorumu Sil</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Kapat"></button>
+                </div>
+                <div class="modal-body">
+                    Bu yorumu silmek istediğinize emin misiniz?
+                </div>
+                <div class="modal-footer">
+                    <form method="POST" action="{% url 'delete_comment' comment.id %}">
+                        {% csrf_token %}
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">İptal</button>
+                        <button type="submit" class="btn btn-danger">Evet, Sil</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+{% endfor %}
+
+<!-- ⭐ Yıldız JS -->
 <script>
-    function createStars(divId, inputId) {
-        const starsDiv = document.getElementById(divId);
-        const input = document.getElementById(inputId);
-    
-        if (!starsDiv || !input) {
-            console.error('DIV veya INPUT bulunamadı:', divId, inputId);
-            return;
-        }
-    
-        input.style.display = "none"; // input gözükmesin
-    
-        for (let i = 1; i <= 5; i++) {
-            const star = document.createElement('i');
-            star.classList.add('fa-regular', 'fa-star');
-            star.style.fontSize = '30px';
-            star.style.cursor = 'pointer';
-            star.style.marginRight = '5px';
-    
-            // ⭐ Tıklama eventi
-            star.addEventListener('click', function() {
-                const rating = parseInt(this.getAttribute('data-value'));
-                input.value = rating;
-                updateStars(divId, rating);
-            });
-    
-            // ⭐ Değer ata (hangi yıldıza tıklanırsa ona göre)
-            star.setAttribute('data-value', i);
-    
-            starsDiv.appendChild(star);
+function createStars(divId, inputId) {
+    const starsDiv = document.getElementById(divId);
+    const input = document.getElementById(inputId);
+    if (!starsDiv || !input) return;
+    input.style.display = "none";
+    for (let i = 1; i <= 5; i++) {
+        const star = document.createElement('i');
+        star.classList.add('fa-regular', 'fa-star');
+        star.style.fontSize = '30px';
+        star.style.cursor = 'pointer';
+        star.style.marginRight = '5px';
+        star.setAttribute('data-value', i);
+        star.addEventListener('click', function () {
+            input.value = this.getAttribute('data-value');
+            updateStars(divId, input.value);
+        });
+        starsDiv.appendChild(star);
+    }
+}
+
+function updateStars(divId, value) {
+    const stars = document.getElementById(divId).children;
+    for (let i = 0; i < stars.length; i++) {
+        if (i < value) {
+            stars[i].classList.remove('fa-regular');
+            stars[i].classList.add('fa-solid');
+        } else {
+            stars[i].classList.remove('fa-solid');
+            stars[i].classList.add('fa-regular');
         }
     }
-    
-    function updateStars(divId, value) {
-        const stars = document.getElementById(divId).children;
-        for (let i = 0; i < stars.length; i++) {
-            if (i < value) {
-                stars[i].classList.remove('fa-regular');
-                stars[i].classList.add('fa-solid');
-            } else {
-                stars[i].classList.remove('fa-solid');
-                stars[i].classList.add('fa-regular');
-            }
-        }
-    }
-    
-    // ✨ Sayfa yüklenince yıldızları oluştur
-    document.addEventListener('DOMContentLoaded', function() {
-        createStars('acting-stars', 'acting');
-        createStars('story-stars', 'story');
-        createStars('cinematography-stars', 'cinematography');
-    });
-    </script>
-{% endblock %}    
+}
+
+document.addEventListener('DOMContentLoaded', function () {
+    createStars('acting-stars', 'acting');
+    createStars('story-stars', 'story');
+    createStars('cinematography-stars', 'cinematography');
+});
+</script>
+{% endblock %}

@@ -221,3 +221,14 @@ def load_more_movies(request):
 
     return JsonResponse({'movies': movies_data})
 
+@login_required
+def delete_comment(request, comment_id):
+    comment = get_object_or_404(Comment, id=comment_id)
+
+    if request.user == comment.user:
+        comment.delete()
+        messages.success(request, "Yorumunuz silindi.")
+    else:
+        messages.error(request, "Bu yorumu silmeye yetkiniz yok.")
+
+    return redirect(request.META.get('HTTP_REFERER', 'home'))

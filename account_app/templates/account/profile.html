@@ -86,8 +86,12 @@
             <a href="{% url 'profile_view' req.from_user.username %}" class="text-white">{{ req.from_user.username }}</a>
             <form method="post" action="{% url 'accept_follow_request' req.id %}">
               {% csrf_token %}
-              <button type="submit" class="btn btn-success btn-sm">Kabul Et</button>
+              <button type="submit" class="btn btn-outline-success btn-sm">Kabul Et</button>
             </form>
+            <form method="post" action="{% url 'reject_follow_request' req.id %}">
+              {% csrf_token %}
+              <button type="submit" class="btn btn-outline-danger btn-sm ms-2">Reddet</button>
+            </form>              
           </li>
         {% endfor %}
       </ul>

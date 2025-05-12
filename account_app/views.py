@@ -144,3 +144,9 @@ def accept_follow_request(request, request_id):
     follower_profile.following.add(following_profile)
     follow_request.delete()
     return redirect('profile_view', username=request.user.username)
+
+@login_required
+def reject_follow_request(request, request_id):
+    follow_request = get_object_or_404(FollowRequest, id=request_id, to_user=request.user)
+    follow_request.delete()
+    return redirect('profile_view', username=request.user.username)
