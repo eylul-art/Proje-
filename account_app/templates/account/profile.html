@@ -28,14 +28,14 @@
         {% else %}
           <form method="post" action="{% url 'send_follow_request' profile.user.username %}">
             {% csrf_token %}
-            <button class="btn btn-warning">Takip İsteği Gönder</button>
+            <button class="btn btn-request">Takip İsteği Gönder</button>
           </form>
         {% endif %}
       {% else %}
         <form method="post" action="{% url is_following|yesno:'unfollow_user,follow_user' profile.user.username %}">
           {% csrf_token %}
-          <button class="btn btn-{{ is_following|yesno:'danger,primary' }}">
-            {{ is_following|yesno:"Unfollow,Follow" }}
+          <button class="btn {% if is_following %}btn-unfollow{% else %}btn-follow{% endif %}">
+            {{ is_following|yesno:"Takibi Bırak ,Takip Et" }}
           </button>
         </form>
       {% endif %}

@@ -43,6 +43,37 @@
             transition: transform 0.3s ease-in-out;
             box-shadow: 0 10px 25px rgba(255, 255, 255, 0.2), 0 0 10px rgba(255, 255, 255, 0.15);
         }
+
+        .btn-request {
+            background-color:rgb(104, 36, 168); 
+            color: white;
+            font-weight: bold;
+            border: none;
+        }
+        .btn-request:hover {
+            background-color:rgba(104, 36, 168, 0.59);
+            color: white;
+        }
+
+        .btn-follow {
+            background-color:rgb(104, 36, 168); /* yeşil */
+            color: white;
+            font-weight: bold;
+        }
+        .btn-follow:hover {
+            background-color:rgba(104, 36, 168, 0.59);
+        }
+        
+        .btn-unfollow {
+            background-color: #dc3545; /* kırmızı */
+            color: white;
+            font-weight: bold;
+        }
+        .btn-unfollow:hover {
+            background-color: #c82333;
+        }
+        
+        
         
     </style>
     {% block extra_css %}{% endblock %}
