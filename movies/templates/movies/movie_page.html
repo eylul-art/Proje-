@@ -29,15 +29,12 @@
             <i class="fas fa-heart"></i> {{ movie.total_favorites }} kişi favoriledi
         </p>
     {% else %}
-        <p><a href="{% url 'account_login' %}" class="btn btn-warning">Giriş Yap</a> yaparak favorilere ekleyebilirsin.</p>
+        <p class="text-white">Filmi Favorilemek için <a href="{% url 'account_login' %}" class="text-warning">giriş yapmalısınız</a>.</p>
     {% endif %}
-
-
-
+    
     <hr class="my-4">
-    <h3 class="mb-3">Yorumlar</h3>
 
-    {% if user.is_authenticated %}
+    {% if user.is_authenticated and not has_commented %}
         <form method="POST" class="text-start">
             {% csrf_token %}
             <div class="mb-3">
@@ -64,10 +61,16 @@
 
             <button type="submit" class="btn btn-light">Yorum Yap</button>
         </form>
+    {% elif user.is_authenticated %}
+        <p class="text-white">Bu filme zaten yorum yaptınız.</p>
     {% else %}
-        <p class="mt-3">
-            <a href="{% url 'account_login' %}" class="btn btn-warning">Giriş Yap</a> yaparak yorum yazabilirsin.
-        </p>
+        <p class="text-white">Yorum yapabilmek için <a href="{% url 'account_login' %}" class="text-warning">giriş yapmalısınız</a>.</p>
+    {% endif %}
+
+    {% if comments %}
+        <h4 class="mt-4">Tüm Yorumlar</h4>
+    {% else %}
+        <p class="text-white">Henüz hiç yorum yapılmamış.</p>
     {% endif %}
 
     {% for comment in comments %}

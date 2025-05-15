@@ -71,6 +71,9 @@ def movie_detail(request, movie_id):
     is_favorite = False
     if request.user.is_authenticated:
         is_favorite = Favorite.objects.filter(user=request.user, movie=movie).exists()
+        
+    has_commented = Comment.objects.filter(movie=movie, user=request.user).exists() if request.user.is_authenticated else False
+
 
     return render(request, "movies/movie_page.html", {
         "movie": movie,
@@ -78,6 +81,7 @@ def movie_detail(request, movie_id):
         "comments": comments,
         "form": form,
         "average_rating": average_rating,
+        "has_commented": has_commented,
     })
 
 
