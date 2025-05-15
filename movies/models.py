@@ -44,6 +44,7 @@ class Comment(models.Model):
     story = models.PositiveIntegerField(null=True, blank=True)
     cinematography = models.PositiveIntegerField(null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
+    edited = models.BooleanField(default=False)
     
     class Meta:
         unique_together = ('movie', 'user')

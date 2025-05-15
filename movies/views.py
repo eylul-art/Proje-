@@ -2,7 +2,7 @@ import requests
 from django.shortcuts import render, get_object_or_404, redirect
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
-from django.views.decorators.http import require_GET
+from django.views.decorators.http import require_GET, require_POST
 from django.http import JsonResponse
 from .models import Movie, Favorite, Comment, Genre
 from .forms import CommentForm
@@ -236,3 +236,23 @@ def delete_comment(request, comment_id):
         messages.error(request, "Bu yorumu silmeye yetkiniz yok.")
 
     return redirect(request.META.get('HTTP_REFERER', 'home'))
+
+@login_required
+@require_POST
+def edit_comment(request, comment_id):
+    comment = get_object_or_404(Comment, id=comment_id, user=request.user)
+    text = request.POST.get("text")
+    acting = request.POST.get("acting")
+    story = request.POST.get("story")
+    cinematography = request.POST.get("cinematography")
+
+    if text:
+        comment.text = text
+    if acting: comment.acting = acting
+    if story: comment.story = story
+    if cinematography: comment.cinematography = cinematography
+
+    comment.edited = True
+    comment.save()
+    messages.success(request, "Yorum başarıyla güncellendi.")
+    return redirect("movie_detail", movie_id=comment.movie.tmdb_id)
