@@ -61,7 +61,7 @@ def movie_detail(request, movie_id):
                 comment.user = request.user
                 comment.movie = movie
                 comment.save()
-                messages.success(request, "Yorumun başarıyla eklendi!")  # İstersen başarı mesajı da
+                messages.success(request, "Yorumun başarıyla eklendi!")  
                 return redirect('movie_detail', movie_id=movie.tmdb_id)
         else:
             return redirect('account_login')

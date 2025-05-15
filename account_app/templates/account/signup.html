@@ -3,6 +3,13 @@
 {% block content %}
 <div class="blur-container mx-auto" style="max-width: 500px; text-align: center; border-radius: 20px; padding: 40px;">
     <h2 class="mb-4">Kayıt Ol</h2>
+    {% if form.non_field_errors %}
+    <div class="alert alert-danger text-white" style="background-color: rgba(220, 53, 69, 0.3); backdrop-filter: blur(10px); border-radius: 12px;">
+        {% for error in form.non_field_errors %}
+            {{ error }}
+        {% endfor %}
+     </div>
+    {% endif %}
     <form method="post" action="{% url 'account_signup' %}">
         {% csrf_token %}
         {% for field in form %}

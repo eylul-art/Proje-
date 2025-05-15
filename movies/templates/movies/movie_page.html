@@ -1,14 +1,6 @@
 {% extends 'base.html' %}
 {% block title %}{{ movie.title }}{% endblock %}
 {% block content %}
-{% if messages %}
-  {% for message in messages %}
-    <div class="alert {% if message.tags %}alert-{{ message.tags }}{% endif %} alert-dismissible fade show" role="alert">
-      {{ message }}
-      <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-    </div>
-  {% endfor %}
-{% endif %}
 
 <!-- 🎬 Film Detayları + Yorumlar ve Formlar -->
 <div class="blur-container mx-auto" style="max-width: 850px; text-align: center; border-radius: 20px; padding: 40px; position: relative; z-index: 1;">
