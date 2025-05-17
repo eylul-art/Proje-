@@ -3,11 +3,12 @@ from django.shortcuts import render, get_object_or_404, redirect
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.http import require_GET, require_POST
-from django.http import JsonResponse
+from django.http import JsonResponse, HttpResponseBadRequest
 from .models import Movie, Favorite, Comment, Genre
 from .forms import CommentForm
 from account_app.models import UserProfile
 from django.contrib import messages
+from django.views.decorators.csrf import csrf_exempt
 
 # 🎬 FILM DETAY
 def movie_detail(request, movie_id):
@@ -256,3 +257,43 @@ def edit_comment(request, comment_id):
     comment.save()
     messages.success(request, "Yorum başarıyla güncellendi.")
     return redirect("movie_detail", movie_id=comment.movie.tmdb_id)
+
+@require_POST
+@login_required
+def like_comment(request, comment_id):
+    if request.headers.get('x-requested-with') != 'XMLHttpRequest':
+        return HttpResponseBadRequest("Geçersiz istek.")
+
+    comment = get_object_or_404(Comment, id=comment_id)
+    user = request.user
+
+    if user in comment.likes.all():
+        comment.likes.remove(user)
+    else:
+        comment.likes.add(user)
+        comment.dislikes.remove(user)
+
+    return JsonResponse({
+        'likes': comment.likes.count(),
+        'dislikes': comment.dislikes.count()
+    })
+
+@require_POST
+@login_required
+def dislike_comment(request, comment_id):
+    if request.headers.get('x-requested-with') != 'XMLHttpRequest':
+        return HttpResponseBadRequest("Geçersiz istek.")
+
+    comment = get_object_or_404(Comment, id=comment_id)
+    user = request.user
+
+    if user in comment.dislikes.all():
+        comment.dislikes.remove(user)
+    else:
+        comment.dislikes.add(user)
+        comment.likes.remove(user)
+
+    return JsonResponse({
+        'likes': comment.likes.count(),
+        'dislikes': comment.dislikes.count()
+    })

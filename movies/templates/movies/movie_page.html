@@ -102,6 +102,22 @@
                     Sinematografi: {{ comment.cinematography }} ⭐
                 </p>
             {% endif %}
+
+            <!-- 👍 👎 Butonları -->
+            <div class="mt-2 d-flex align-items-center gap-3">
+                <button type="button" class="btn btn-outline-light btn-sm like-btn" data-comment-id="{{ comment.id }}" style="border: none;">
+                    <i class="fa{% if user in comment.likes.all %}-solid{% else %}-regular{% endif %} fa-thumbs-up"></i>
+                    <span id="like-count-{{ comment.id }}">{{ comment.likes.count }}</span>
+                </button>
+
+                <button type="button" class="btn btn-outline-light btn-sm dislike-btn" data-comment-id="{{ comment.id }}" style="border: none;">
+                    <i class="fa{% if user in comment.dislikes.all %}-solid{% else %}-regular{% endif %} fa-thumbs-down"></i>
+                    <span id="dislike-count-{{ comment.id }}">{{ comment.dislikes.count }}</span>
+                </button>
+            </div>
+
+            
+            
         </div>
     {% endfor %}
 </div> <!-- ✨ blur-container kapanışı -->
@@ -231,4 +247,64 @@ document.addEventListener('DOMContentLoaded', function () {
 });
 
 </script>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        function sendLikeDislike(commentId, action) {
+            fetch(`/movies/comment/${commentId}/${action}/`, {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': '{{ csrf_token }}',
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'Content-Type': 'application/json'
+                },
+                credentials: 'same-origin',
+            })
+            .then(response => response.json())
+            .then(data => {
+                // Sayıları güncelle
+                document.getElementById(`like-count-${commentId}`).textContent = data.likes;
+                document.getElementById(`dislike-count-${commentId}`).textContent = data.dislikes;
+    
+                // İkonları güncelle
+                const likeBtn = document.querySelector(`.like-btn[data-comment-id="${commentId}"] i`);
+                const dislikeBtn = document.querySelector(`.dislike-btn[data-comment-id="${commentId}"] i`);
+    
+                // Reset ikonlar
+                likeBtn.classList.remove('fa-solid', 'fa-regular');
+                dislikeBtn.classList.remove('fa-solid', 'fa-regular');
+    
+                // Aktif olanı koy
+                if (action === 'like') {
+                    likeBtn.classList.add('fa-solid');
+                    dislikeBtn.classList.add('fa-regular');
+                } else {
+                    likeBtn.classList.add('fa-regular');
+                    dislikeBtn.classList.add('fa-solid');
+                }
+            })
+            .catch(error => {
+                console.error("İstek başarısız:", error);
+            });
+        }
+    
+        document.querySelectorAll('.like-btn').forEach(button => {
+            button.addEventListener('click', function () {
+                const commentId = this.getAttribute('data-comment-id');
+                sendLikeDislike(commentId, 'like');
+            });
+        });
+    
+        document.querySelectorAll('.dislike-btn').forEach(button => {
+            button.addEventListener('click', function () {
+                const commentId = this.getAttribute('data-comment-id');
+                sendLikeDislike(commentId, 'dislike');
+            });
+        });
+    });
+    
+</script>
+    
+    
+
 {% endblock %}

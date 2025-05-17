@@ -45,7 +45,9 @@ class Comment(models.Model):
     cinematography = models.PositiveIntegerField(null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     edited = models.BooleanField(default=False)
-    
+    likes = models.ManyToManyField(User, related_name='liked_comments', blank=True)
+    dislikes = models.ManyToManyField(User, related_name='disliked_comments', blank=True)
+  
     class Meta:
         unique_together = ('movie', 'user')
 
