@@ -217,11 +217,19 @@ def load_more_movies(request):
                 'poster_url': f"https://image.tmdb.org/t/p/w500{movie_data.get('poster_path', '')}" if movie_data.get('poster_path') else "",
             }
         )
+
+        # Ortalama puanı hesapla
+        comments = movie.comments.all()
+        all_averages = [c.average_rating() for c in comments if c.average_rating() is not None]
+        avg_rating = round(sum(all_averages) / len(all_averages), 1) if all_averages else None
+
         movies_data.append({
             'id': movie.tmdb_id,
             'title': movie.title,
             'poster_url': movie.poster_url,
-            'release_date': movie.release_date,
+            'release_date': movie.release_date.strftime('%Y-%m-%d') if movie.release_date else '',
+            'like_count': movie.favorites.count(),  # 🩵 <- Favorite modelinde related_name='favorites' olmalı!
+            'average_rating': avg_rating,
         })
 
     return JsonResponse({'movies': movies_data})

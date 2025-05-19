@@ -21,10 +21,13 @@
     {% if user.is_authenticated %}
         <form action="{% url 'toggle_favorite' movie.tmdb_id %}" method="POST">
             {% csrf_token %}
-            <button type="submit" class="btn w-100 mb-3" style="background: linear-gradient(45deg, #8a2be2, #5a1c91); color: white; font-weight: bold; padding: 12px; border-radius: 10px;">
-                {% if is_favorite %}Favorilerden Kaldır{% else %}Favorilere Ekle{% endif %}
+            <button type="submit" class="btn w-100 mb-1" style="background: linear-gradient(45deg, #8a2be2, #5a1c91); color: white; font-weight: bold; padding: 12px; border-radius: 10px;">
+                {% if is_favorite %} Favorilerden Kaldır{% else %} Favorilere Ekle{% endif %}
             </button>
         </form>
+        <p class="text-white mt-1">
+            <i class="fas fa-heart"></i> {{ movie.total_favorites }} kişi favoriledi
+        </p>
     {% else %}
         <p><a href="{% url 'account_login' %}" class="btn btn-warning">Giriş Yap</a> yaparak favorilere ekleyebilirsin.</p>
     {% endif %}

@@ -60,12 +60,17 @@
                     col.innerHTML = `
                         <div class="blur-container text-center p-3 h-100">
                             <a href="/movies/${movie.id}/" class="text-decoration-none text-white">
-                                <img src="${movie.poster_url}" alt="${movie.title}" class="img-fluid rounded mb-2" style="max-height: 250px; object-fit: cover;">
+                                <img src="${movie.poster_url}" alt="${movie.title}" class="img-fluid rounded mb-2" style="max-height: 300px; object-fit: cover;">
                                 <h5>${movie.title}</h5>
-                                <p><small>${movie.release_date || 'Tarih yok'}</small></p>
+                                <p><small>${formatDate(movie.release_date)}</small></p>
+                                <div class="d-flex justify-content-center gap-3 mt-2">
+                                    <span title="Beğeni Sayısı">  <i class="fas fa-heart"></i> ${movie.like_count ?? 0}</span>
+                                    <span title="Ortalama Puan"> <i class = "fas fa-star"></i> ${movie.average_rating ?? 'N/A'}</span>
+                                </div>
                             </a>
                         </div>
                     `;
+
                     movieList.appendChild(col);
                 });
                 page++;
@@ -88,5 +93,13 @@
         currentGenre = genreSelect.value;
         loadMovies();
     });
+
+    function formatDate(dateStr) {
+        if (!dateStr) return "Tarih yok";
+        const date = new Date(dateStr);
+        const months = ['Ocak', 'Şubat', 'Mart', 'Nisan', 'Mayıs', 'Haziran', 'Temmuz', 'Ağustos', 'Eylül', 'Ekim', 'Kasım', 'Aralık'];
+        return `${date.getDate()} ${months[date.getMonth()]} ${date.getFullYear()}`;
+    }
+    
 </script>
 {% endblock %}
