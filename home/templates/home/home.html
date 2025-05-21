@@ -1,24 +1,92 @@
 {% extends 'base.html' %}
 {% block title %}Anasayfa{% endblock %}
 {% block content %}
-<div class="container">
-    <h2 class="text-center mb-4">Popüler Filmler</h2>
-    <div class="row">
-        {% if movies %}
-            {% for movie in movies %}
-                <div class="col-md-4 mb-4">
-                    <div class="blur-container text-center p-3">
-                        <a href="{% url 'movie_detail' movie.id %}" class="text-decoration-none text-white">
-                            <img src="https://image.tmdb.org/t/p/w500{{ movie.poster_path }}" alt="{{ movie.title }}" class="img-fluid rounded mb-2" style="max-height: 300px; object-fit: cover;">
-                            <h5>{{ movie.title }}</h5>
-                            <p>{{ movie.overview|truncatechars:100 }}</p>
-                        </a>
-                    </div>
+<div class="container py-4">
+
+    <!-- 🎞️ Günün Filmi -->
+    <h2 class="text-white mb-3 text-center">🎞️ Günün Filmi</h2>
+    {% if random_movie %}
+        <div class="row mb-5 justify-content-center">
+            <div class="col-md-6">
+                <div class="blur-container p-3 text-center">
+                    <a href="{% url 'movie_detail' random_movie.tmdb_id %}" class="text-white text-decoration-none">
+                        <img src="{{ random_movie.poster_url }}" onerror="this.src='/static/default-poster.jpg'" class="img-fluid rounded" style="max-height: 400px; object-fit: cover;">
+                        <h4 class="mt-3">{{ random_movie.title }}</h4>
+                        <p>{{ random_movie.overview|truncatechars:200 }}</p>
+                    </a>
                 </div>
-            {% endfor %}
-        {% else %}
-            <p class="text-center text-white">Filmler yüklenemedi. API'den veri alınamıyor.</p>
-        {% endif %}
+            </div>
+        </div>
+    {% endif %}
+
+    <!-- ⭐ Kullanıcıların En Çok Favorilediği Filmler -->
+    <h2 class="text-white mb-3 text-center">⭐ Kullanıcılarımızın En Çok Favorilediği Filmler</h2>
+    <div class="row mb-5">
+        {% for movie in top_favorited %}
+            {% if movie.tmdb_id %}
+            <div class="col-md-3 mb-4">
+                <div class="blur-container p-2 text-center">
+                    <a href="{% url 'movie_detail' movie.tmdb_id %}" class="text-white text-decoration-none">
+                        <img src="{{ movie.poster_url }}" onerror="this.src='/static/default-poster.jpg'" class="img-fluid rounded" style="height: 250px; object-fit: cover;">
+                        <h6 class="mt-2">{{ movie.title }}</h6>
+                        <small>{{ movie.total_favorites }} <i class="fas fa-heart"></i> </small>
+                    </a>
+                </div>
+            </div>
+            {% endif %}
+        {% endfor %}
     </div>
+
+    <!-- 🔥 Tüm Zamanların En Popüler Filmleri -->
+    <h2 class="text-white mb-3 text-center">🔥 Tüm Zamanların En Popüler Filmleri</h2>
+    <div class="row mb-5">
+        {% for movie in all_time_popular %}
+            {% if movie.tmdb_id %}
+            <div class="col-md-3 mb-4">
+                <div class="blur-container p-2 text-center">
+                    <a href="{% url 'movie_detail' movie.tmdb_id %}" class="text-white text-decoration-none">
+                        <img src="{{ movie.poster_url }}" onerror="this.src='/static/default-poster.jpg'" class="img-fluid rounded" style="height: 250px; object-fit: cover;">
+                        <h6 class="mt-2">{{ movie.title }}</h6>
+                    </a>
+                </div>
+            </div>
+            {% endif %}
+        {% endfor %}
+    </div>
+
+    <!-- 📈 Son Zamanlarda Popüler -->
+    <h2 class="text-white mb-3 text-center">📈 Son Zamanlarda Popüler</h2>
+    <div class="row mb-5">
+        {% for movie in trending %}
+            {% if movie.tmdb_id %}
+            <div class="col-md-3 mb-4">
+                <div class="blur-container p-2 text-center">
+                    <a href="{% url 'movie_detail' movie.tmdb_id %}" class="text-white text-decoration-none">
+                        <img src="{{ movie.poster_url }}" onerror="this.src='/static/default-poster.jpg'" class="img-fluid rounded" style="height: 250px; object-fit: cover;">
+                        <h6 class="mt-2">{{ movie.title }}</h6>
+                    </a>
+                </div>
+            </div>
+            {% endif %}
+        {% endfor %}
+    </div>
+
+    <!-- 🎬 Yeni Çıkanlar -->
+    <h2 class="text-white mb-3 text-center">🎬 Yeni Çıkanlar</h2>
+    <div class="row mb-5">
+        {% for movie in new_releases %}
+            {% if movie.tmdb_id %}
+            <div class="col-md-3 mb-4">
+                <div class="blur-container p-2 text-center">
+                    <a href="{% url 'movie_detail' movie.tmdb_id %}" class="text-white text-decoration-none">
+                        <img src="{{ movie.poster_url }}" onerror="this.src='/static/default-poster.jpg'" class="img-fluid rounded" style="height: 250px; object-fit: cover;">
+                        <h6 class="mt-2">{{ movie.title }}</h6>
+                    </a>
+                </div>
+            </div>
+            {% endif %}
+        {% endfor %}
+    </div>
+
 </div>
 {% endblock %}
