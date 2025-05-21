@@ -190,6 +190,8 @@ def search_movies(request):
         'query': query
     })
 
+from datetime import datetime
+
 @require_GET
 def load_more_movies(request):
     page = int(request.GET.get("page", 1))
@@ -208,17 +210,29 @@ def load_more_movies(request):
     movies_data = []
 
     for movie_data in data.get('results', []):
-        movie, _ = Movie.objects.get_or_create(
-            tmdb_id=movie_data["id"],
-            defaults={
-                'title': movie_data.get("title", "Bilinmeyen"),
-                'overview': movie_data.get("overview", ""),
-                'release_date': movie_data.get("release_date") or None,
-                'poster_url': f"https://image.tmdb.org/t/p/w500{movie_data.get('poster_path', '')}" if movie_data.get('poster_path') else "",
-            }
-        )
+        try:
+            movie, _ = Movie.objects.get_or_create(
+                tmdb_id=movie_data["id"],
+                defaults={
+                    'title': movie_data.get("title", "Bilinmeyen"),
+                    'overview': movie_data.get("overview", ""),
+                    'release_date': movie_data.get("release_date") or None,
+                    'poster_url': f"https://image.tmdb.org/t/p/w500{movie_data.get('poster_path', '')}"
+                    if movie_data.get('poster_path') else "",
+                }
+            )
+        except Exception as e:
+            print(f"Film oluşturulurken hata: {e}")
+            continue
 
-        # Ortalama puanı hesapla
+        release_date = movie.release_date
+        if isinstance(release_date, str):
+            release_date_str = release_date
+        elif release_date:
+            release_date_str = release_date.strftime('%Y-%m-%d')
+        else:
+            release_date_str = ''
+
         comments = movie.comments.all()
         all_averages = [c.average_rating() for c in comments if c.average_rating() is not None]
         avg_rating = round(sum(all_averages) / len(all_averages), 1) if all_averages else None
@@ -227,13 +241,12 @@ def load_more_movies(request):
             'id': movie.tmdb_id,
             'title': movie.title,
             'poster_url': movie.poster_url,
-            'release_date': movie.release_date.strftime('%Y-%m-%d') if movie.release_date else '',
-            'like_count': movie.favorites.count(),  # 🩵 <- Favorite modelinde related_name='favorites' olmalı!
+            'release_date': release_date_str,
+            'like_count': movie.favorites.count(),
             'average_rating': avg_rating,
         })
 
     return JsonResponse({'movies': movies_data})
-
 @login_required
 def delete_comment(request, comment_id):
     comment = get_object_or_404(Comment, id=comment_id)
